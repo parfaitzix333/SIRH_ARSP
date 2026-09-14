@@ -61,7 +61,45 @@ class ProfileController extends Controller
     //les profiles
     public function accueil_dg()
     {
-        $user=Auth::user();
+        $user = Auth::user();
         return view('profile.accueil_dg', compact('user'));
+    }
+
+    public function accueil_secDg()
+    {
+        $user = Auth::user();
+        return view('profile.accueil_secGeneral', compact('user'));
+    }
+
+    public function accueil_cs()
+    {
+        $user = Auth::user();
+        return view('profile.accueil_chef_serv', compact('user'));
+    }
+
+    public function accueil_cd()
+    {
+        $user = Auth::user();
+        return view('profile.accueil_chef_div', compact('user'));
+    }
+    public function accueil_cb1()
+    {
+        $user = Auth::user();
+        return view('profile.accueil_bureau1', compact('user'));
+    }
+    public function accueil_cb2()
+    {
+        $user = Auth::user();
+        return view('profile.accueil_bureau2', compact('user'));
+    }
+    public function accueil_cb3()
+    {
+        $user = Auth::user();
+        return view('profile.accueil_bureau3', compact('user'));
+    }
+    public function accueil_employe()
+    {
+        $user = Auth::user();
+        return view('profile.accueil_employe', compact('user'));
     }
 }

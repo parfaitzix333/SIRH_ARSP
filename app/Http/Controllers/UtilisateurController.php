@@ -67,7 +67,11 @@ class UtilisateurController extends Controller
             'password' => 'required|string|min:8|confirmed',
             'matricule' => 'nullable|string|max:255',
             'role' => ['required', 'string', 'in:' . implode(',', self::ROLES)],
+            'autorisation' => ['nullable', 'boolean'],
         ]);
+
+        $users['autorisation'] = $request->boolean('autorisation', false);
+
         $utilisateur = User::create($users);
 
         $this->historiqueAction('Création d\'un nouvel utilisateur : ' . $users['name']);
@@ -84,9 +88,12 @@ class UtilisateurController extends Controller
             'role' => ['required', 'string', 'in:' . implode(',', self::ROLES)],
             'password' => 'nullable|string|min:8',
             'matricule' => 'nullable|string|max:255',
+            'autorisation' => ['nullable', 'boolean'],
         ]);
 
         try {
+            $data['autorisation'] = $request->boolean('autorisation', false);
+
             if (!empty($data['password'])) {
                 $data['password'] = bcrypt($data['password']);
             } else {

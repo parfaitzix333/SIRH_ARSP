@@ -1,10 +1,18 @@
 @php
     $key = $field['key'];
     $value = $item ? data_get($item, $key) : old($key);
+    if ($value === null && array_key_exists('default', $field)) {
+        $value = $field['default'];
+    }
     $type = $field['type'] ?? 'text';
     $inputType = $type === 'date' ? 'date' : ($type === 'datetime' ? 'datetime-local' : $type);
     if ($value instanceof \Carbon\CarbonInterface) {
         $value = $type === 'datetime' ? $value->format('Y-m-d\\TH:i') : $value->format('Y-m-d');
+    }
+    if ($type === 'time' && is_string($value)) {
+        $value = preg_match('/^\d{2}:\d{2}:\d{2}$/', trim((string) $value))
+            ? substr(trim((string) $value), 0, 5)
+            : $value;
     }
     $class = $field['full'] ?? false ? 'full-width' : '';
 @endphp
@@ -56,7 +64,8 @@
             value="{{ $type === 'file' ? '' : $value }}"
             {{ ($field['required'] ?? false) && !$item ? 'required' : '' }}
             {{ isset($field['step']) ? 'step=' . $field['step'] : '' }}
-            {{ isset($field['min']) ? 'min=' . $field['min'] : '' }}>
+            {{ isset($field['min']) ? 'min=' . $field['min'] : '' }}
+            {{ isset($field['max']) ? 'max=' . $field['max'] : '' }}>
         @if ($type === 'file' && $item)
             <small class="text-muted">Laisser vide pour conserver le fichier actuel.</small>
         @endif

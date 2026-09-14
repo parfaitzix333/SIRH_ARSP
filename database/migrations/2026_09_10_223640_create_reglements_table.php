@@ -14,7 +14,8 @@ return new class extends Migration
         Schema::create('reglements', function (Blueprint $table) {
             $table->id();
             $table->integer('numero');
-            $table->string('designation', 500);
+            $table->string('titre', 500);
+            $table->string('designation', 1000);
             $table->timestamps();
         });
     }

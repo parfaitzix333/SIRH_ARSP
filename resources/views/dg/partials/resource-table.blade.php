@@ -2,6 +2,7 @@
     $columns = $columns ?? [];
     $fields = $fields ?? [];
     $resource = $resource ?? null;
+    $fileRoute = $fileRoute ?? 'communiques.file';
     $formTitle = $formTitle ?? $title;
     $hasAnneeField = collect($fields)->contains('key', 'annee_id');
     $fieldOptions = function (array $field) {
@@ -14,6 +15,19 @@
                 'annees' => \App\Models\annee::orderByDesc('annee')->get(),
                 'employes' => \App\Models\employe::orderBy('nom')->get(),
                 'services' => \App\Models\service::orderBy('nom_service')->get(),
+                'domaines' => \App\Models\service::query()
+                    ->whereNotNull('domaine')
+                    ->where('domaine', '<>', '')
+                    ->select('domaine')
+                    ->distinct()
+                    ->orderBy('domaine')
+                    ->get()
+                    ->map(
+                        fn($service) => [
+                            'value' => $service->domaine,
+                            'label' => $service->domaine,
+                        ],
+                    ),
                 'grades' => \App\Models\grade::orderBy('designation')->get(),
                 'categories' => \App\Models\categorie::orderBy('designation')->get(),
                 'postes' => \App\Models\poste::orderBy('intitule')->get(),
@@ -118,12 +132,65 @@
                                 @endphp
                                 <td>
                                     @if (($column['type'] ?? null) === 'status')
-                                        <span
-                                            class="badge {{ in_array($value, ['active', 'validee', 'soumise', 'oui']) ? 'bg-success-subtle text-success' : 'bg-secondary-subtle text-secondary' }}">
+                                        @php
+                                            $statusClass = match (strtolower((string) $value)) {
+                                                'entrée',
+                                                'entree',
+                                                'active',
+                                                'validee',
+                                                'soumise',
+                                                'oui',
+                                                'present',
+                                                'in',
+                                                'entrant'
+                                                    => 'bg-success-subtle text-success',
+                                                'sortie',
+                                                'sortie',
+                                                'inactive',
+                                                'refusee',
+                                                'non',
+                                                'absent',
+                                                'out',
+                                                'sortant'
+                                                    => 'bg-danger-subtle text-danger',
+                                                default => 'bg-secondary-subtle text-secondary',
+                                            };
+                                        @endphp
+                                        <span class="badge {{ $statusClass }}">
                                             {{ $value ?? '-' }}
                                         </span>
+                                    @elseif (($column['type'] ?? null) === 'computed_status' && $item->date_publication)
+                                        @php
+                                            $publicationDate = \Illuminate\Support\Carbon::parse(
+                                                $item->date_publication,
+                                            );
+                                            $isPublished = now()->greaterThanOrEqualTo($publicationDate);
+                                            $statusText = $isPublished ? 'public' : 'programé';
+                                            $statusClass = $isPublished
+                                                ? 'bg-success-subtle text-success'
+                                                : 'bg-danger-subtle text-danger';
+                                        @endphp
+                                        <span class="badge {{ $statusClass }}">{{ $statusText }}</span>
+                                    @elseif (($column['type'] ?? null) === 'file' && $value)
+                                        @php
+                                            $normalizedValue = str_replace('\\', '/', (string) $value);
+                                            $isRemoteFile =
+                                                str_starts_with($normalizedValue, 'http://') ||
+                                                str_starts_with($normalizedValue, 'https://');
+                                            $fileUrl = $isRemoteFile
+                                                ? $normalizedValue
+                                                : route($fileRoute, ['path' => $normalizedValue]);
+                                        @endphp
+                                        <a href="{{ $fileUrl }}" target="_blank" rel="noopener"
+                                            class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-file-download me-1"></i> Ouvrir
+                                        </a>
                                     @elseif (($column['type'] ?? null) === 'date' && $value)
                                         {{ \Illuminate\Support\Carbon::parse($value)->format('d/m/Y') }}
+                                    @elseif ($column['key'] === 'titre' && is_scalar($value))
+                                        <strong>{{ Str::limit((string) $value, 60) }}</strong>
+                                    @elseif ($column['key'] === 'designation' && is_scalar($value))
+                                        {{ Str::limit((string) $value, 55) }}
                                     @else
                                         {{ is_scalar($value) ? ($value ?: '-') : '-' }}
                                     @endif
@@ -134,17 +201,22 @@
                             @endif
                             @if ($resource && $fields)
                                 <td class="text-center">
-                                    <div class="resource-actions">
-                                        <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal"
-                                            data-bs-target="#editResource{{ $item->id }}" title="Modifier"
-                                            aria-label="Modifier"><i class="fas fa-pen"></i></button>
-                                        <form action="{{ route($resource . '.destroy', $item->id) }}" method="POST"
-                                            onsubmit="return confirm('Supprimer cet élément ?');">
-                                            @csrf @method('DELETE')
-                                            <button type="submit" class="btn btn-outline-danger" title="Supprimer"
-                                                aria-label="Supprimer"><i class="fas fa-trash-can"></i></button>
-                                        </form>
-                                    </div>
+                                    @if ($user->autorisation == true)
+                                        <div class="resource-actions">
+                                            <button type="button" class="btn btn-outline-primary"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#editResource{{ $item->id }}" title="Modifier"
+                                                aria-label="Modifier"><i class="fas fa-pen"></i></button>
+                                            <form action="{{ route($resource . '.destroy', $item->id) }}"
+                                                method="POST" onsubmit="return confirm('Supprimer cet élément ?');">
+                                                @csrf @method('DELETE')
+                                                <button type="submit" class="btn btn-outline-danger" title="Supprimer"
+                                                    aria-label="Supprimer"><i class="fas fa-trash-can"></i></button>
+                                            </form>
+                                        </div>
+                                    @else
+                                        <i class="fa fa-lock fs-4 text-danger"></i>
+                                    @endif
                                 </td>
                             @endif
                         </tr>

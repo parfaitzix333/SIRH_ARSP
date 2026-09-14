@@ -7,7 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 class dossiers_etude extends Model
 {
     protected $table = 'dossiers_etude';
-    protected $fillable = ['designation', 'employe_id', 'annee_id'];
+    protected $fillable = [
+        'type_document',
+        'fichier',
+        'annee_id',
+        'employe_id',
+    ];
 
     public function annee()
     {

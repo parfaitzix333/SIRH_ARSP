@@ -4,10 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DAF-ACADEMY</title>
+    <title>ARSP HAU-KATANGA</title>
     <link rel="icon" href="{{ asset('image/logo.jpeg') }}" type="image/jpeg">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    @include('dg.shared_style')
 
     <style>
         /* ============================================
@@ -376,6 +377,15 @@
             height: 1px;
             background: rgba(255, 255, 255, 0.1);
             margin: 10px 20px;
+        }
+
+        .sidebar .nav-section-title {
+            padding: 12px 25px 6px;
+            color: rgb(0, 248, 248);
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
         }
 
         .sidebar .logout-btn {
@@ -799,7 +809,7 @@
             @php
                 $les_annees = \App\Models\annee::orderBy('annee', 'desc')->get();
                 $currentUser = Auth::user();
-                $selectedAnneeId = $currentUser ? $currentUser->annee_id : null;
+                $selectedAnneeId = session('annee_id') ?? $currentUser?->annee_id;
             @endphp
 
             @if ($les_annees->count() > 0)
@@ -814,7 +824,7 @@
                         <option value="">Sélectionnez</option>
                         @foreach ($les_annees as $annee)
                             <option value="{{ $annee->id }}"
-                                {{ $currentUser && $currentUser->annee_id == $annee->id ? 'selected' : '' }}>
+                                {{ $selectedAnneeId == $annee->id ? 'selected' : ($selectedAnneeId === null && $annee->statut === 'active' ? 'selected' : '') }}>
                                 {{ $annee->annee }}
                             </option>
                         @endforeach
@@ -839,7 +849,7 @@
                 <br>
                 <span class="role-badge">{{ Auth::user()->role ?? '—' }}</span>
             </span>
-            <a href="#" class="btn btn-outline-light btn-sm">
+            <a href="{{ route('profile.edit') }}" class="btn btn-outline-light btn-sm">
                 <i class="fa fa-edit"></i>
                 <small class="label_profil">Mon
                     Profil</small></a>
@@ -858,18 +868,94 @@
     SIDEBAR
     ============================================ -->
     <nav class="sidebar" id="sidebar">
-        <a href="#" class="nav-item {{ request()->routeIs('profile_dg') ? 'active' : '' }}">
+        <a href="{{ route('accueil_dg') }}" class="nav-item {{ request()->routeIs('accueil_dg') ? 'active' : '' }}">
             <i class="fas fa-home"></i> Accueil
         </a>
-        <a href="#" class="nav-item {{ request()->routeIs('historiques.*') ? 'active' : '' }}">
-            <i class="fas fa-credit-card"></i> Historiques
+        <div class="nav-section-title">Gestion du personnel</div>
+
+        <a href="{{ route('les_employes') }}"
+            class="nav-item {{ request()->routeIs('les_employes') ? 'active' : '' }}">
+            <i class="fas fa-users"></i> Employés
+        </a>
+        <a href="{{ route('les_affectations') }}"
+            class="nav-item {{ request()->routeIs('les_affectations') ? 'active' : '' }}">
+            <i class="fas fa-sitemap"></i> Affectations
+        </a>
+        <a href="{{ route('les_presences') }}"
+            class="nav-item {{ request()->routeIs('les_presences') ? 'active' : '' }}">
+            <i class="fas fa-user-clock"></i> Présences
+        </a>
+        <a href="{{ route('les_performances') }}"
+            class="nav-item {{ request()->routeIs('les_performances') ? 'active' : '' }}">
+            <i class="fas fa-chart-line"></i> Performances
+        </a>
+        <a href="{{ route('les_dossiers_etude') }}"
+            class="nav-item {{ request()->routeIs('les_dossiers_etude') ? 'active' : '' }}">
+            <i class="fas fa-folder-open"></i> Dossiers d'étude
+        </a>
+        <a href="{{ route('les_archives') }}"
+            class="nav-item {{ request()->routeIs('les_archives') ? 'active' : '' }}">
+            <i class="fas fa-archive"></i> Archives
+        </a>
+        <a href="{{ route('les_formations_employes') }}"
+            class="nav-item {{ request()->routeIs('les_formations_employes') ? 'active' : '' }}">
+            <i class="fas fa-user-graduate"></i> Formations des employés
+        </a>
+        <a href="{{ route('les_mouvements') }}"
+            class="nav-item {{ request()->routeIs('les_mouvements') ? 'active' : '' }}">
+            <i class="fas fa-right-left"></i> Mouvements
         </a>
 
-        <a href="#" class="nav-item {{ request()->routeIs('les_contacts.*') ? 'active' : '' }}">
-            <i class="fas fa-chalkboard-teacher"></i> contacts
+        <div class="nav-section-title">Congés et suivi</div>
+        <a href="{{ route('les_demandes_conge') }}"
+            class="nav-item {{ request()->routeIs('les_demandes_conge') ? 'active' : '' }}">
+            <i class="fas fa-file-signature"></i> Demandes de congé
         </a>
-        <a href="#" class="nav-item {{ request()->routeIs('utilisateurs.*') ? 'active' : '' }}">
-            <i class="fas fa-users"></i> Utilisateurs
+        <a href="{{ route('les_conges') }}" class="nav-item {{ request()->routeIs('les_conges') ? 'active' : '' }}">
+            <i class="fas fa-umbrella-beach"></i> Types de congé
+        </a>
+        <a href="{{ route('les_disciplines') }}"
+            class="nav-item {{ request()->routeIs('les_disciplines') ? 'active' : '' }}">
+            <i class="fas fa-gavel"></i> Disciplines
+        </a>
+        <a href="{{ route('les_sanctions') }}"
+            class="nav-item {{ request()->routeIs('les_sanctions') ? 'active' : '' }}">
+            <i class="fas fa-shield-alt"></i> Sanctions
+            <span class="badge bg-danger">{{ App\Models\sanction::count() }}</span>
+        </a>
+
+        <div class="nav-section-title">Référentiels</div>
+        <a href="{{ route('les_services') }}"
+            class="nav-item {{ request()->routeIs('les_services') ? 'active' : '' }}">
+            <i class="fas fa-building"></i> Services
+        </a>
+        <a href="{{ route('les_categories') }}"
+            class="nav-item {{ request()->routeIs('les_categories') ? 'active' : '' }}">
+            <i class="fas fa-tags"></i> Catégories
+        </a>
+        <a href="{{ route('les_posts') }}" class="nav-item {{ request()->routeIs('les_posts') ? 'active' : '' }}">
+            <i class="fas fa-briefcase"></i> Postes
+        </a>
+        <a href="{{ route('les_formations') }}"
+            class="nav-item {{ request()->routeIs('les_formations') ? 'active' : '' }}">
+            <i class="fas fa-chalkboard-teacher"></i> Formations
+        </a>
+        <a href="{{ route('les_annees') }}" class="nav-item {{ request()->routeIs('les_annees') ? 'active' : '' }}">
+            <i class="fas fa-calendar-alt"></i> Années
+        </a>
+        <a href="{{ route('les_reglements') }}"
+            class="nav-item {{ request()->routeIs('les_reglements') ? 'active' : '' }}">
+            <i class="fas fa-book"></i> Règlements
+        </a>
+        <a href="{{ route('les_proprietes') }}"
+            class="nav-item {{ request()->routeIs('les_proprietes') ? 'active' : '' }}">
+            <i class="fas fa-list-check"></i> Propriétés
+        </a>
+
+        <div class="nav-section-title">Administration et communication</div>
+        <a href="{{ route('les_utilisateurs') }}"
+            class="nav-item {{ request()->routeIs('les_utilisateurs') ? 'active' : '' }}">
+            <i class="fas fa-user-shield"></i> Utilisateurs
             @php
                 try {
                     $userCount = App\Models\User::count();
@@ -879,75 +965,20 @@
             @endphp
             <span class="badge bg-danger">{{ $userCount }}</span>
         </a>
-
-        <div class="nav-divider"></div>
-
-        <a href="#" class="nav-item {{ request()->routeIs('conges.*') ? 'active' : '' }}">
-            <i class="fas fa-coins"></i> les Conger
-            annuels </a>
-        <a href="#" class="nav-item {{ request()->routeIs('les_demandes.*') ? 'active' : '' }}">
-            <i class="fas fa-school"></i> Les demandes congé
+        <a href="{{ route('les_audits') }}" class="nav-item {{ request()->routeIs('les_audits') ? 'active' : '' }}">
+            <i class="fas fa-clipboard-check"></i> Audits
         </a>
-        <a href="#" class="nav-item {{ request()->routeIs('sanctions.*') ? 'active' : '' }}">
-            <i class="fas fa-layer-group"></i> Sanctions
-            <span class="badge bg-danger">{{ App\Models\sanction::count() }}</span>
+        <a href="{{ route('historique') }}" class="nav-item {{ request()->routeIs('historique') ? 'active' : '' }}">
+            <i class="fas fa-history"></i> Historiques
         </a>
-        <a href="#" class="nav-item {{ request()->routeIs('presences.*') ? 'active' : '' }}">
-            <i class="fas fa-envelope"></i> Les Présences
+        <a href="{{ route('les_communiques') }}"
+            class="nav-item {{ request()->routeIs('les_communiques') ? 'active' : '' }}">
+            <i class="fas fa-bullhorn"></i> Communiqués
         </a>
-
-        <div class="nav-divider"></div>
-        <a href="#" class="nav-item {{ request()->routeIs('employes.*') ? 'active' : '' }}">
-            <i class="fas fa-calendar-alt"></i> les Employes
+        <a href="{{ route('les_contacts') }}"
+            class="nav-item {{ request()->routeIs('les_contacts') ? 'active' : '' }}">
+            <i class="fas fa-address-book"></i>Contacts
         </a>
-
-        <a href="#" class="nav-item {{ request()->routeIs('annees.*') ? 'active' : '' }}">
-            <i class="fas fa-calendar-alt"></i> Années
-        </a>
-        <a href="#" class="nav-item {{ request()->routeIs('archives.*') ? 'active' : '' }}">
-            <i class="fas fa-calendar-alt"></i> les Archives
-        </a>
-        <a href="#" class="nav-item {{ request()->routeIs('communiques.*') ? 'active' : '' }}">
-            <i class="fas fa-calendar-alt"></i> les Communiqués
-        </a>
-        <a href="#" class="nav-item {{ request()->routeIs('performances.*') ? 'active' : '' }}">
-            <i class="fas fa-calendar-alt"></i> les Performances
-        </a>
-        <a href="#" class="nav-item {{ request()->routeIs('audits.*') ? 'active' : '' }}">
-            <i class="fas fa-calendar-alt"></i> les Audits
-        </a>
-        <a href="#" class="nav-item {{ request()->routeIs('formations_ems.*') ? 'active' : '' }}">
-            <i class="fas fa-calendar-alt"></i> les Formations employés
-        </a>
-        <a href="#" class="nav-item {{ request()->routeIs('formations.*') ? 'active' : '' }}">
-            <i class="fas fa-calendar-alt"></i> les Formations
-        </a>
-        <a href="#" class="nav-item {{ request()->routeIs('disciplines.*') ? 'active' : '' }}">
-            <i class="fas fa-calendar-alt"></i> les Discipliques
-        </a>
-        <a href="#" class="nav-item {{ request()->routeIs('dossiers_et.*') ? 'active' : '' }}">
-            <i class="fas fa-calendar-alt"></i> les Dossiers etude
-        </a>
-        <a href="#" class="nav-item {{ request()->routeIs('affectations.*') ? 'active' : '' }}">
-            <i class="fas fa-calendar-alt"></i> les Affectations
-        </a>
-        <a href="#" class="nav-item {{ request()->routeIs('posts.*') ? 'active' : '' }}">
-            <i class="fas fa-calendar-alt"></i> les posts
-        </a>
-        <a href="#" class="nav-item {{ request()->routeIs('categories.*') ? 'active' : '' }}">
-            <i class="fas fa-calendar-alt"></i> les Catégories
-        </a>
-        <a href="#" class="nav-item {{ request()->routeIs('services.*') ? 'active' : '' }}">
-            <i class="fas fa-calendar-alt"></i> les Services
-        </a>
-        <a href="#" class="nav-item {{ request()->routeIs('reglements.*') ? 'active' : '' }}">
-            <i class="fas fa-calendar-alt"></i> les Reglements
-        </a>
-
-        <a href="#" class="nav-item {{ request()->routeIs('nos_proprietes.*') ? 'active' : '' }}">
-            <i class="fas fa-user-graduate"></i> Propriétés
-        </a>
-        <div class="nav-divider"></div>
 
         <!-- Déconnexion -->
         <form method="POST" action="{{ route('logout') }}"

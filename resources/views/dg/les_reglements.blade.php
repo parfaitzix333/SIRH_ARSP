@@ -5,12 +5,14 @@
         'items' => $les_reglements,
         'columns' => [
             ['key' => 'numero', 'label' => 'Numéro'],
-            ['key' => 'designation', 'label' => 'Désignation'],
+            ['key' => 'titre', 'label' => 'Titre'],
+            ['key' => 'designation', 'label' => 'Description'],
         ],
         'resource' => 'reglements',
         'fields' => [
             ['key' => 'numero', 'label' => 'Numéro', 'type' => 'number', 'required' => true],
-            ['key' => 'designation', 'label' => 'Désignation', 'type' => 'textarea', 'required' => true],
+            ['key' => 'titre', 'label' => 'Titre', 'required' => true],
+            ['key' => 'designation', 'label' => 'Description', 'type' => 'textarea', 'required' => true],
         ],
     ])
 @endsection

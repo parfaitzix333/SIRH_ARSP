@@ -156,6 +156,11 @@ class DgController extends Controller
         return $this->vueAvecCollection('les_dossiers_etude', 'les_dossiers_etude', dossiers_etude::class);
     }
 
+    public function les_dossiers_etudes()
+    {
+        return $this->vueAvecCollection('les_dossiers_etudes', 'les_dossiers_etudes', dossiers_etude::class);
+    }
+
     public function les_employes()
     {
         return $this->vueAvecCollection('les_employes', 'les_employes', employe::class);

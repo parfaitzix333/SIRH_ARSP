@@ -12,4 +12,9 @@ class mouvement extends Model
     {
         return $this->belongsTo(employe::class);
     }
+
+    public function annee()
+    {
+        return $this->belongsTo(annee::class);
+    }
 }

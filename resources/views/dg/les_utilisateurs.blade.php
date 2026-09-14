@@ -412,7 +412,8 @@
                         <th>Nom</th>
                         <th>Email</th>
                         <th>Rôle</th>
-                        <th>Année Scolaire</th>
+                        <th>Autorisation</th>
+                        <th>Année</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -458,9 +459,16 @@
                                 </span>
                             </td>
                             <td>
-                                @if ($u->anneeScolaire)
+                                @if ($u->autorisation)
+                                    <span class="badge bg-success">Oui</span>
+                                @else
+                                    <span class="badge bg-secondary">Non</span>
+                                @endif
+                            </td>
+                            <td>
+                                @if ($u->annee)
                                     <span class="badge bg-info text-dark">
-                                        {{ $u->anneeScolaire->annee ?? 'N/A' }}
+                                        {{ $u->annee->annee ?? 'N/A' }}
                                     </span>
                                 @else
                                     <span class="badge bg-secondary">N/A</span>
@@ -472,6 +480,7 @@
                                         data-user-id="{{ $u->id }}" data-user-name="{{ $u->name }}"
                                         data-user-matricule="{{ $u->matricule ?? '' }}"
                                         data-user-email="{{ $u->email }}" data-user-role="{{ $u->role }}"
+                                        data-user-autorisation="{{ (int) ($u->autorisation ?? false) }}"
                                         data-user-annee="{{ $u->annee_scolaire_id ?? '' }}" title="Modifier">
                                         <i class="fas fa-edit"></i>
                                     </button>
@@ -545,6 +554,16 @@
                                         <option value="{{ $role }}">{{ $role }}</option>
                                     @endforeach
                                 </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label"><i class="fas fa-check-circle"></i> Autorisation</label>
+                                <div class="form-check mt-2">
+                                    <input class="form-check-input" type="checkbox" name="autorisation"
+                                        id="edit_autorisation" value="1">
+                                    <label class="form-check-label" for="edit_autorisation">
+                                        Autoriser cet utilisateur
+                                    </label>
+                                </div>
                             </div>
                         </div>
                         <div class="modal-footer">
@@ -646,6 +665,7 @@
             const editName = document.getElementById('edit_name');
             const editEmail = document.getElementById('edit_email');
             const editRole = document.getElementById('edit_role');
+            const editAutorisation = document.getElementById('edit_autorisation');
             const editAnnee = document.getElementById('edit_annee');
 
             // Écouter l'événement show.bs.modal
@@ -661,6 +681,8 @@
                     const userName = button.getAttribute('data-user-name');
                     const userEmail = button.getAttribute('data-user-email');
                     const userRole = button.getAttribute('data-user-role');
+                    const userAutorisation = button.getAttribute('data-user-autorisation') === '1' || button
+                        .getAttribute('data-user-autorisation') === 'true';
                     const userAnnee = button.getAttribute('data-user-annee');
 
                     // Remplir le formulaire
@@ -669,6 +691,7 @@
                     if (editName) editName.value = userName || '';
                     if (editEmail) editEmail.value = userEmail || '';
                     if (editRole) editRole.value = userRole || '';
+                    if (editAutorisation) editAutorisation.checked = userAutorisation;
                     if (editAnnee) editAnnee.value = userAnnee || '';
 
                     console.log('Modal ouvert pour:', {
@@ -677,6 +700,7 @@
                         name: userName,
                         email: userEmail,
                         role: userRole,
+                        autorisation: userAutorisation,
                         annee: userAnnee
                     });
                 });
@@ -692,6 +716,8 @@
                     const userName = this.getAttribute('data-user-name');
                     const userEmail = this.getAttribute('data-user-email');
                     const userRole = this.getAttribute('data-user-role');
+                    const userAutorisation = this.getAttribute('data-user-autorisation') === '1' ||
+                        this.getAttribute('data-user-autorisation') === 'true';
                     const userAnnee = this.getAttribute('data-user-annee');
 
                     // Remplir directement (au cas où l'événement show.bs.modal échoue)
@@ -700,6 +726,7 @@
                     if (editName) editName.value = userName || '';
                     if (editEmail) editEmail.value = userEmail || '';
                     if (editRole) editRole.value = userRole || '';
+                    if (editAutorisation) editAutorisation.checked = userAutorisation;
                     if (editAnnee) editAnnee.value = userAnnee || '';
                 });
             });

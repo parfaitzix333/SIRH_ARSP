@@ -29,7 +29,7 @@ return new class extends Migration
             $table->decimal('assiduite', 5, 2)->nullable();
             $table->decimal('comportement', 5, 2)->nullable();
             $table->decimal('travail_equipe', 5, 2)->nullable();
-            $table->decimal('cote_generale', 5, 2)->nullable();
+            $table->decimal('cote_generale', 5, 2)->default(0);
 
             $table->text('appreciation')->nullable();
             $table->text('recommandations')->nullable();

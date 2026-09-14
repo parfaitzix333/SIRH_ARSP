@@ -6,5 +6,5 @@ use Illuminate\Database\Eloquent\Model;
 
 class reglement extends Model
 {
-    protected $fillable = ['numero', 'designation'];
+    protected $fillable = ['numero', 'titre', 'designation'];
 }

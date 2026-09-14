@@ -33,6 +33,16 @@ class AuthenticatedSessionController extends Controller
         if ($user->id === 1 || $user->role === 'DG') {
             return redirect()->route('accueil_dg');
         }
+        if ($user->role === 'Suspendu') {
+            Auth::logout();
+            return redirect()->route('login')->with('error', 'Votre compte est suspendu. Veuillez contacter l’administrateur.');
+        }
+        if ($user->role === 'SecDG') {
+            return redirect()->route('accueil_secDg');
+        }
+        if ($user->role === 'Chef-Service') {
+            return redirect()->route('accueil_cs');
+        }
 
         return redirect()->intended(route('dashboard', absolute: false));
     }

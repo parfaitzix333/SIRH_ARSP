@@ -3,10 +3,11 @@
     @include('dg.partials.resource-table', [
         'title' => 'Archives',
         'items' => $les_archives,
+        'fileRoute' => 'archives.file',
         'columns' => [
             ['key' => 'type_document', 'label' => 'Type'],
             ['key' => 'titre', 'label' => 'Titre'],
-            ['key' => 'fichier', 'label' => 'Fichier'],
+            ['key' => 'fichier', 'label' => 'Fichier', 'type' => 'file'],
             ['key' => 'date_archivage', 'label' => 'Date', 'type' => 'date'],
         ],
         'resource' => 'archives',

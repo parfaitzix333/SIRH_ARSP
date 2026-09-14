@@ -9,10 +9,16 @@ use Illuminate\Http\Request;
 class ReglementController extends Controller
 {
     use HandlesCrudHistory;
+
     private function rules(): array
     {
-        return ['numero' => ['required', 'integer'], 'designation' => ['required', 'string', 'max:500']];
+        return [
+            'numero' => ['required', 'integer'],
+            'titre' => ['required', 'string', 'max:500'],
+            'designation' => ['required', 'string', 'max:1000'],
+        ];
     }
+
     public function store(Request $request)
     {
         $data = $request->validate($this->rules());
@@ -20,6 +26,7 @@ class ReglementController extends Controller
         $this->historique('Création du règlement #' . $item->numero);
         return back()->with('success', 'Règlement créé avec succès.');
     }
+
     public function update(Request $request, $id)
     {
         $item = reglement::findOrFail($id);
@@ -27,6 +34,7 @@ class ReglementController extends Controller
         $this->historique('Mise à jour du règlement #' . $item->numero);
         return back()->with('success', 'Règlement mis à jour avec succès.');
     }
+
     public function destroy($id)
     {
         $item = reglement::findOrFail($id);

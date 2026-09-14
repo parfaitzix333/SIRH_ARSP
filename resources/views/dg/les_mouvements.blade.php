@@ -6,6 +6,7 @@
         'columns' => [
             ['key' => 'employe.nom', 'label' => 'Employé'],
             ['key' => 'mouvement', 'label' => 'Mouvement', 'type' => 'status'],
+            ['key' => 'created_at', 'label' => 'Date', 'type' => 'date'],
             ['key' => 'heure', 'label' => 'Heure'],
         ],
         'resource' => 'mouvements',
@@ -28,6 +29,13 @@
                 'required' => true,
             ],
             ['key' => 'heure', 'label' => 'Heure', 'type' => 'time', 'required' => true],
+            [
+                'key' => 'annee_id',
+                'label' => 'Année',
+                'type' => 'select',
+                'options' => 'annees',
+                'required' => true,
+            ],
         ],
     ])
 @endsection

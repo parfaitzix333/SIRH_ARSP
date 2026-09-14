@@ -12,7 +12,7 @@ class AuditController extends Controller
 
     private function rules(): array
     {
-        return ['employe_id' => ['required', 'exists:employes,id'], 'role' => ['required', 'string', 'max:100'], 'ordre' => ['required', 'integer'], 'date_debut_service' => ['nullable', 'date'], 'date_fin_service' => ['nullable', 'date', 'after_or_equal:date_debut_service'], 'annee_id' => ['required', 'exists:annees,id']];
+        return ['employe_id' => ['required', 'exists:employes,id'], 'role' => ['nullable', 'string', 'max:100'], 'ordre' => ['required', 'integer'], 'date_debut_service' => ['nullable', 'date'], 'date_fin_service' => ['nullable', 'date', 'after_or_equal:date_debut_service'], 'annee_id' => ['required', 'exists:annees,id']];
     }
 
     public function store(Request $request)

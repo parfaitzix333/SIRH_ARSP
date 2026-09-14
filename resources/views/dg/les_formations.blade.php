@@ -12,11 +12,10 @@
         ],
         'resource' => 'formations',
         'fields' => [
-            ['key' => 'domaine', 'label' => 'Domaine'],
+            ['key' => 'domaine', 'label' => 'Domaine', 'type' => 'select', 'options' => 'domaines'],
             ['key' => 'intitule', 'label' => 'Intitulé', 'required' => true],
             ['key' => 'date_debut', 'label' => 'Début', 'type' => 'date', 'required' => true],
             ['key' => 'date_fin', 'label' => 'Fin', 'type' => 'date', 'required' => true],
-            ['key' => 'nb_jour', 'label' => 'Nombre de jours', 'type' => 'number'],
             [
                 'key' => 'annee_id',
                 'label' => 'Année',

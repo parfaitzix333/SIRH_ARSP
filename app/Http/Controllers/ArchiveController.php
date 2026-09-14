@@ -70,6 +70,20 @@ class ArchiveController extends Controller
         $this->historique('Mise à jour de l’archive #' . $item->id, $item->annee_id);
         return back()->with('success', 'Archive mise à jour avec succès.');
     }
+
+    public function viewAttachment(string $path)
+    {
+        $normalizedPath = str_replace('\\', '/', $path);
+        $safePath = preg_replace('#(^|/)(\.\.?)(/|$)#', '/', $normalizedPath);
+
+        abort_unless(Storage::disk('public')->exists($safePath), 404);
+
+        return response()->file(
+            Storage::disk('public')->path($safePath),
+            ['Content-Disposition' => 'inline; filename="' . basename($safePath) . '"'],
+        );
+    }
+
     public function destroy($id)
     {
         $item = archive::findOrFail($id);
