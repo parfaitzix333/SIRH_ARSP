@@ -42,9 +42,22 @@ class AuthenticatedSessionController extends Controller
         if ($user->role === 'SecDG') {
             return redirect()->route('accueil_secDg');
         }
+        if ($user->role === 'Chef-Division') {
+            return redirect()->route('accueil_cd');
+        }
         if ($user->role === 'Chef-Service') {
             return redirect()->route('accueil_cs');
         }
+        if ($user->role === 'Chef-Bureau1') {
+            return redirect()->route('accueil_cb1');
+        }
+        if ($user->role === 'Chef-Bureau2') {
+            return redirect()->route('accueil_cb2');
+        }
+        if ($user->role === 'Chef-Bureau3') {
+            return redirect()->route('accueil_cb3');
+        }
+
         if ($employe) {
             return redirect()->route('accueil_employe');
         }

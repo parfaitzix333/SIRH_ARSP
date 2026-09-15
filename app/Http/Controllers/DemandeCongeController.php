@@ -236,7 +236,7 @@ class DemandeCongeController extends Controller
 
         $data = $request->validate([
             'valide_national' => ['required', 'boolean'],
-            'statut' => ['required', 'in:validee,refusee'],
+            'statut' => ['nullable', 'in:validee,refusee'],
             'commentaire_validation' => ['nullable', 'string', 'max:5000'],
         ]);
 

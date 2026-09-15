@@ -71,9 +71,7 @@
                     <strong>ARSP</strong><br>
                     <small>Autorité de Régulation de la Sous-traitance dans le Secteur Privé</small>
                 </div>
-                <h2 class="text-primary">Province du Haut-Katanga</h2>
             </div>
-
             <div class="text-end"><strong>FICHE DE DEMANDE DE CONGÉ</strong><br><small>Référence :
                     #{{ $demande->id }}</small></div>
         </div>
@@ -128,32 +126,25 @@
             <p class="border rounded p-3" style="min-height: 80px;">{{ $demande->commentaire_validation ?: '—' }}</p>
         </div>
         <div class="row g-4 mt-5 p-4">
-            <div class="col-3">
+            <div class="col-md-4">
                 <div class="signature">
-                    <strong> de l'agent concerné</strong><br>
+                    <strong> Agent concerné</strong><br>
                     <small>{{ $employe?->nom ?? 'Agent concerné' }}</small>
                     <div class="signature-name">Signature</div>
                 </div>
             </div>
-            <div class="col-3">
-                <div class="signature">
-                    <strong> DRH</strong><br>
-
-                    <div class="signature-name">Signature</div>
-                </div>
-            </div>
-            <div class="col-3">
+            <div class="col-md-4">
                 <div class="signature">
                     <strong> Sup.Hiérarch.</strong><br>
                     <small>Signature et Sceau</small>
                     <div class="signature-name">Sceau</div>
                 </div>
             </div>
-            <div class="col-3">
+            <div class="col-md-4">
                 <div class="signature">
                     <strong>Directeur Général Provincial</strong><br>
                     <small>Signature et sceau</small>
-                    <div class="signature-name"> Sceau</div>
+                    <div class="signature-name"> et sceau</div>
                 </div>
             </div>
         </div>

@@ -5,6 +5,7 @@ use App\Http\Controllers\AffectationController;
 use App\Http\Controllers\ArchiveController;
 use App\Http\Controllers\AuditController;
 use App\Http\Controllers\CategorieController;
+use App\Http\Controllers\ChefDivController;
 use App\Http\Controllers\ChefServController;
 use App\Http\Controllers\CommuniqueController;
 use App\Http\Controllers\CongeController;
@@ -54,6 +55,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/accueil_secDg', [ProfileController::class, 'accueil_secDg'])->name('accueil_secDg');
     Route::get('/accueil_cs', [ProfileController::class, 'accueil_cs'])->name('accueil_cs');
     Route::get('/accueil_employe', [ProfileController::class, 'accueil_employe'])->name('accueil_employe');
+    Route::get('/accueil_cd', [ProfileController::class, 'accueil_cd'])->name('accueil_cd');
+    Route::get('/accueil_cb1', [ProfileController::class, 'accueil_cb1'])->name('accueil_cb1');
+    Route::get('/accueil_cb2', [ProfileController::class, 'accueil_cb2'])->name('accueil_cb2');
+    Route::get('/accueil_cb3', [ProfileController::class, 'accueil_cb3'])->name('accueil_cb3');
+
     //=====================================================================
 
 
@@ -93,6 +99,49 @@ Route::middleware('auth')->group(function () {
     //========================================================
 
 
+
+
+    //les pages du chef de division
+    Route::get('/les_contacts_CD', [ChefDivController::class, 'les_contacts'])->name('les_contacts_CD');
+    Route::put('/switcher-annee', [ChefDivController::class, 'switcher_annee'])->name('switcher_annee');
+    Route::get('/les_demandes_conge_CD', [ChefDivController::class, 'les_demandes_conge'])->name('les_demandes_conge_CD');
+    Route::put('/demandes-conges/{id}/valider-secdg', [DemandeCongeController::class, 'validerParSecDg'])
+        ->name('valider_conge_secdg');
+    Route::put('/demandes-conges/{id}/valider-nationalement', [DemandeCongeController::class, 'validerNationalement'])
+        ->name('valider_conge_national');
+    Route::put('/demandes-conges/{id}/annuler-secdg', [DemandeCongeController::class, 'annulerParSecDg'])
+        ->name('annuler_conge_secdg');
+    Route::delete('/demandes-conges/{id}/supprimer-secdg', [DemandeCongeController::class, 'supprimerParSecDg'])
+        ->name('supprimer_conge_secdg');
+    Route::get('/les_conges_CD', [ChefDivController::class, 'les_conges'])->name('les_conges_CD');
+    Route::get('/les_communiques_CD', [ChefDivController::class, 'les_communiques'])->name('les_communiques_CD');
+    Route::get('/les_categories_CD', [ChefDivController::class, 'les_categories'])->name('les_categories_CD');
+    Route::get('/les_audits_CD', [ChefDivController::class, 'les_audits'])->name('les_audits_CD');
+    Route::get('/les_archives_CD', [ChefDivController::class, 'les_archives'])->name('les_archives_CD');
+    Route::get('/les_annees_CD', [ChefDivController::class, 'les_annees'])->name('les_annees_CD');
+    Route::get('/les_affectations_CD', [ChefDivController::class, 'les_affectations'])->name('les_affectations_CD');
+    Route::get('/historique_CD', [ChefDivController::class, 'historique'])->name('historique_CD');
+    Route::delete('/historiques/{id}', [HistoriqueController::class, 'destroy'])->name('historiques.destroy');
+    Route::delete('/historiques', [HistoriqueController::class, 'clearAll'])->name('historiques.clearAll');
+    Route::delete('/historiques-selectionnes', [HistoriqueController::class, 'deleteSelected'])->name('deleteSelected');
+    Route::get('/les_posts_CD', [ChefDivController::class, 'les_posts'])->name('les_posts_CD');
+    Route::get('/les_disciplines_CD', [ChefDivController::class, 'les_disciplines'])->name('les_disciplines_CD');
+    Route::get('/les_dossiers_etude_CD', [ChefDivController::class, 'les_dossiers_etude'])->name('les_dossiers_etude_CD');
+    Route::get('/les_dossiers_etudes_CD', [ChefDivController::class, 'les_dossiers_etudes'])->name('les_dossiers_etudes_CD');
+    Route::get('/les_employes_CD', [ChefDivController::class, 'les_employes'])->name('les_employes_CD');
+    Route::get('/les_formations_CD', [ChefDivController::class, 'les_formations'])->name('les_formations_CD');
+    Route::get('/les_formations_employes_CD', [ChefDivController::class, 'les_formations_employes'])->name('les_formations_employes_CD');
+    Route::get('/les_mouvements_CD', [ChefDivController::class, 'les_mouvements'])->name('les_mouvements_CD');
+    Route::get('/les_performances_CD', [ChefDivController::class, 'les_performances'])->name('les_performances_CD');
+    Route::get('/les_presences_CD', [ChefDivController::class, 'les_presences'])->name('les_presences_CD');
+    Route::get('/les_proprietes_CD', [ChefDivController::class, 'les_proprietes'])->name('les_proprietes_CD');
+    Route::get('/les_reglements_CD', [ChefDivController::class, 'les_reglements'])->name('les_reglements_CD');
+    Route::get('/les_sanctions_CD', [ChefDivController::class, 'les_sanctions'])->name('les_sanctions_CD');
+    Route::get('/les_services_CD', [ChefDivController::class, 'les_services'])->name('les_services_CD');
+    Route::get('/les_utilisateurs_CD', [ChefDivController::class, 'les_utilisateurs'])->name('les_utilisateurs_CD');
+    Route::get('/fiche_de_demande_conge/{id}', [ChefDivController::class, 'fiche_de_demande_conge'])->name('fiche_de_demande_conge');
+    Route::get('/les_grades_CD', [ChefDivController::class, 'les_grades'])->name('les_grades_CD');
+    //========================================================
 
 
     //les pages du secretaire generale

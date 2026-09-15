@@ -58,6 +58,8 @@ class ProfileController extends Controller
         return Redirect::to('/');
     }
 
+
+
     //les profiles
     public function accueil_dg()
     {
