@@ -15,6 +15,7 @@ use App\Http\Controllers\DossiersEtudeController;
 use App\Http\Controllers\EmployeController;
 use App\Http\Controllers\FormationController;
 use App\Http\Controllers\FormationEmployeController;
+use App\Http\Controllers\GradeController;
 use App\Http\Controllers\HistoriqueController;
 use App\Http\Controllers\MouvementController;
 use App\Http\Controllers\PerformanceController;
@@ -38,6 +39,11 @@ Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
+Route::get('/form_employe_register', [UtilisateurController::class, 'form_employe_register'])->name('form_employe_register');
+Route::get('/form_employe_login', [UtilisateurController::class, 'form_employe_login'])->name('form_employe_login');
+Route::post('/employe_register', [UtilisateurController::class, 'employe_register'])->name('employe_register');
+Route::post('/employe_login', [UtilisateurController::class, 'employe_login'])->name('employe_login');
+
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -47,6 +53,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/accueil_dg', [ProfileController::class, 'accueil_dg'])->name('accueil_dg');
     Route::get('/accueil_secDg', [ProfileController::class, 'accueil_secDg'])->name('accueil_secDg');
     Route::get('/accueil_cs', [ProfileController::class, 'accueil_cs'])->name('accueil_cs');
+    Route::get('/accueil_employe', [ProfileController::class, 'accueil_employe'])->name('accueil_employe');
     //=====================================================================
 
 
@@ -92,6 +99,14 @@ Route::middleware('auth')->group(function () {
     Route::get('/les_contacts_SG', [SecDgController::class, 'les_contacts'])->name('les_contacts_SG');
     Route::put('/switcher-annee', [SecDgController::class, 'switcher_annee'])->name('switcher_annee');
     Route::get('/les_demandes_conge_SG', [SecDgController::class, 'les_demandes_conge'])->name('les_demandes_conge_SG');
+    Route::put('/demandes-conges/{id}/valider-secdg', [DemandeCongeController::class, 'validerParSecDg'])
+        ->name('valider_conge_secdg');
+    Route::put('/demandes-conges/{id}/valider-nationalement', [DemandeCongeController::class, 'validerNationalement'])
+        ->name('valider_conge_national');
+    Route::put('/demandes-conges/{id}/annuler-secdg', [DemandeCongeController::class, 'annulerParSecDg'])
+        ->name('annuler_conge_secdg');
+    Route::delete('/demandes-conges/{id}/supprimer-secdg', [DemandeCongeController::class, 'supprimerParSecDg'])
+        ->name('supprimer_conge_secdg');
     Route::get('/les_conges_SG', [SecDgController::class, 'les_conges'])->name('les_conges_SG');
     Route::get('/les_communiques_SG', [SecDgController::class, 'les_communiques'])->name('les_communiques_SG');
     Route::get('/les_categories_SG', [SecDgController::class, 'les_categories'])->name('les_categories_SG');
@@ -118,6 +133,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/les_sanctions_SG', [SecDgController::class, 'les_sanctions'])->name('les_sanctions_SG');
     Route::get('/les_services_SG', [SecDgController::class, 'les_services'])->name('les_services_SG');
     Route::get('/les_utilisateurs_SG', [SecDgController::class, 'les_utilisateurs'])->name('les_utilisateurs_SG');
+    Route::get('/fiche_de_demande_conge/{id}', [SecDgController::class, 'fiche_de_demande_conge'])->name('fiche_de_demande_conge');
+    Route::get('/les_grades_SG', [SecDgController::class, 'les_grades'])->name('les_grades_SG');
     //==========================================================
 
 
@@ -126,6 +143,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/les_contacts_CS', [ChefServController::class, 'les_contacts'])->name('les_contacts_CS');
     Route::put('/switcher-annee', [ChefServController::class, 'switcher_annee'])->name('switcher_annee');
     Route::get('/les_demandes_conge_CS', [ChefServController::class, 'les_demandes_conge'])->name('les_demandes_conge_CS');
+    Route::put('/demandes-conges/{id}/valider-chef-service', [DemandeCongeController::class, 'validerParChefService'])
+        ->name('valider_conge');
     Route::get('/les_conges_CS', [ChefServController::class, 'les_conges'])->name('les_conges_CS');
     Route::get('/les_communiques_CS', [ChefServController::class, 'les_communiques'])->name('les_communiques_CS');
     Route::get('/les_categories_CS', [ChefServController::class, 'les_categories'])->name('les_categories_CS');
@@ -184,6 +203,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('sanctions', SanctionController::class)->only(['store', 'update', 'destroy']);
     Route::resource('disciplines', DisciplineController::class)->only(['store', 'update', 'destroy']);
     Route::resource('conges', CongeController::class)->only(['store', 'update', 'destroy']);
+    Route::resource('grades', GradeController::class)->only(['store', 'update', 'destroy']);
     Route::resource('demandes-conges', DemandeCongeController::class)->only(['store', 'update', 'destroy']);
     Route::get('/archives/file/{path}', [ArchiveController::class, 'viewAttachment'])
         ->where('path', '.*')
@@ -202,6 +222,19 @@ Route::middleware('auth')->group(function () {
     Route::resource('formations-employes', FormationEmployeController::class)->only(['store', 'update', 'destroy']);
     Route::resource('performances', PerformanceController::class)->only(['store', 'update', 'destroy']);
     Route::resource('presences', PresenceController::class)->only(['store', 'update', 'destroy']);
+    //================================================
+
+
+    //les routes pour employé
+    Route::get('/mes_conges', [EmployeController::class, 'mes_conges'])->name('mes_conges');
+    Route::post('/mes_conges', [DemandeCongeController::class, 'storeEmploye'])->name('mes_conges.store');
+    Route::get('/mes_disciplines', [EmployeController::class, 'mes_disciplines'])->name('mes_disciplines');
+    Route::get('/mes_presences', [EmployeController::class, 'mes_presences'])->name('mes_presences');
+    Route::get('/mes_communiques', [EmployeController::class, 'mes_communiques'])->name('mes_communiques');
+    Route::get('/lecture/{id}', [CommuniqueController::class, 'lecture'])->name('lecture');
+    route::get('/mon_autorisation/{employe}', [EmployeController::class, 'mon_autorisation'])->name('mon_autorisation');
+
+    //les affichages communs
 });
 
 require __DIR__ . '/auth.php';

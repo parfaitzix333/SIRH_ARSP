@@ -3,8 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Concerns\HandlesCrudHistory;
+use App\Models\communique;
+use App\Models\annee;
+use App\Models\conge;
+use App\Models\demandes_conge;
 use App\Models\employe;
+use App\Models\service;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
 class EmployeController extends Controller
@@ -37,5 +43,80 @@ class EmployeController extends Controller
         $item->delete();
         $this->historique('Suppression de l’employé : ' . $name, $anneeId);
         return back()->with('success', 'Employé supprimé avec succès.');
+    }
+
+    //les pages pour employés
+    public function mes_conges()
+    {
+        $user = Auth::user();
+        $employe = employe::where('user_id', $user->id)->firstOrFail();
+        $mes_conges = demandes_conge::where('employe_id', $employe->id)
+            ->with(['conge', 'validePar', 'annee'])
+            ->latest()
+            ->get();
+        $anneeId = session('annee_id') ?? $user->annee_id ?? annee::where('statut', 'active')->value('id');
+        $typesConges = conge::where('annee_id', $anneeId)
+            ->where('actif', true)
+            ->where('designation', '!=', 'Congé sabatique')
+            ->orderBy('designation')
+            ->get();
+        $demandeAnnuelleBloquee = $mes_conges
+            ->whereIn('statut', ['soumise', 'validee'])
+            ->contains(fn($demande) => $demande->conge?->designation === 'Congé sabatique');
+
+        return view('emp.mes_conges', compact('user', 'employe', 'mes_conges', 'typesConges', 'demandeAnnuelleBloquee'));
+    }
+
+    public function mes_disciplines()
+    {
+        $user = Auth::user();
+        $employe = employe::where('user_id', $user->id)->firstOrFail();
+        $mes_disciplines = $employe->disciplines()
+            ->with(['sanction', 'annee'])
+            ->latest('DATE')
+            ->get();
+
+        return view('emp.mes_disciplines', compact('user', 'mes_disciplines'));
+    }
+
+    public function mes_presences()
+    {
+        $user = Auth::user();
+        $employe = employe::where('user_id', $user->id)->firstOrFail();
+        $mes_presences = $employe->presences()
+            ->with('annee')
+            ->latest('DATE')
+            ->latest('heure')
+            ->get();
+
+        return view('emp.mes_presences', compact('user', 'mes_presences'));
+    }
+
+    public function mes_communiques()
+    {
+        $user = Auth::user();
+
+        $employe = employe::where('user_id', $user->id)->firstOrFail();
+
+        $lectures = $employe->lectures()
+            ->with('communique')
+            ->latest()
+            ->get();
+
+        $mes_communiques_non_lu = $lectures->where('lu', false);
+        $mes_communiques_lu = $lectures->where('lu', true);
+
+        return view('emp.mes_communiques', compact(
+            'user',
+            'employe',
+            'mes_communiques_lu',
+            'mes_communiques_non_lu'
+        ));
+    }
+    public function mon_autorisation(employe $employe)
+    {
+        $mon_conge = demandes_conge::where('employe_id', $employe->id)->latest()->first();
+        $mon_service = service::find($employe->service_id);
+        return view('emp.mon_autorisation', compact('employe', 'mon_conge', 'mon_service'));
     }
 }

@@ -6,6 +6,7 @@
         'columns' => [
             ['key' => 'matricule', 'label' => 'Matricule'],
             ['key' => 'nom', 'label' => 'Nom'],
+            ['key' => 'grade.designation', 'label' => 'Grade'],
             ['key' => 'service.nom_service', 'label' => 'Service'],
             ['key' => 'niveau_etude', 'label' => 'Niveau d’étude'],
         ],
@@ -13,6 +14,7 @@
         'fields' => [
             ['key' => 'matricule', 'label' => 'Matricule', 'required' => true],
             ['key' => 'nom', 'label' => 'Nom', 'required' => true],
+            ['key' => 'grade_id', 'label' => 'Grade', 'type' => 'select', 'options' => 'grades'],
             ['key' => 'service_id', 'label' => 'Service', 'type' => 'select', 'options' => 'services'],
             ['key' => 'date_naissance', 'label' => 'Date de naissance', 'type' => 'date'],
             ['key' => 'lieu_naissance', 'label' => 'Lieu de naissance'],

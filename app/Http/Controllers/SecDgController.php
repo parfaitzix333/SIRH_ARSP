@@ -16,6 +16,7 @@ use App\Models\dossiers_etude;
 use App\Models\employe;
 use App\Models\formation;
 use App\Models\formation_employe;
+use App\Models\grade;
 use App\Models\historique;
 use App\Models\mouvement;
 use App\Models\poste;
@@ -97,7 +98,24 @@ class SecDgController extends Controller
 
     public function les_demandes_conge()
     {
-        return $this->vueAvecCollection('les_demandes_conge', 'les_demandes_conge', demandes_conge::class);
+        $user = Auth::user();
+        $annee = $this->anneeCourante();
+        $les_demandes_conge = $annee
+            ? demandes_conge::with([
+                'employe.grade',
+                'employe.service',
+                'employe.audits',
+                'conge',
+                'validePar',
+                'annee',
+            ])
+            ->where('annee_id', $annee->id)
+            ->where('valide_serv', true)
+            ->latest()
+            ->get()
+            : collect();
+
+        return view('secdg.les_demandes_conge', compact('user', 'les_demandes_conge'));
     }
 
     public function les_conges()
@@ -163,7 +181,16 @@ class SecDgController extends Controller
 
     public function les_employes()
     {
-        return $this->vueAvecCollection('les_employes', 'les_employes', employe::class);
+        $user = Auth::user();
+        $annee = $this->anneeCourante();
+        $les_employes = $annee
+            ? employe::with(['grade', 'service', 'user'])
+            ->where('annee_id', $annee->id)
+            ->orderBy('nom')
+            ->get()
+            : collect();
+
+        return view('secdg.les_employes', compact('user', 'les_employes'));
     }
 
     public function les_formations()
@@ -174,6 +201,14 @@ class SecDgController extends Controller
     public function les_formations_employes()
     {
         return $this->vueAvecCollection('les_formations_employes', 'les_formations_employes', formation_employe::class);
+    }
+
+    public function les_grades()
+    {
+        $user = Auth::user();
+        $les_grades = grade::withCount('employes')->orderBy('numero')->orderBy('designation')->get();
+
+        return view('secdg.les_grades', compact('user', 'les_grades'));
     }
 
     public function les_mouvements()
@@ -228,5 +263,16 @@ class SecDgController extends Controller
         ${$variable} = $this->parAnnee($model);
 
         return view('secdg.' . $vue, compact('user', $variable));
+    }
+
+    public function fiche_de_demande_conge($id)
+    {
+        abort_unless(Auth::user()?->role === 'SecDG', 403);
+        $user = Auth::user();
+        $demande = demandes_conge::with(['employe', 'conge', 'validePar', 'annee'])
+            ->where('valide_secDg', true)
+            ->findOrFail($id);
+
+        return view('secdg.fiche_de_demande_conge', compact('user', 'demande'));
     }
 }

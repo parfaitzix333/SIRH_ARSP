@@ -968,11 +968,7 @@
                     class="nav-item {{ request()->routeIs('les_disciplines_SG') ? 'active' : '' }}">
                     <i class="fas fa-gavel"></i> Disciplines
                 </a>
-                <a href="{{ route('les_sanctions_SG') }}"
-                    class="nav-item {{ request()->routeIs('les_sanctions_SG') ? 'active' : '' }}">
-                    <i class="fas fa-shield-alt"></i> Sanctions
-                    <span class="badge bg-danger">{{ App\Models\sanction::count() }}</span>
-                </a>
+
             </div>
         </div>
 
@@ -990,18 +986,24 @@
                     class="nav-item {{ request()->routeIs('les_categories_SG') ? 'active' : '' }}">
                     <i class="fas fa-tags"></i> Catégories
                 </a>
+                <a href="{{ route('les_grades_SG') }}"
+                    class="nav-item {{ request()->routeIs('les_grades_SG') ? 'active' : '' }}">
+                    <i class="fas fa-tags"></i> Grades
+                </a>
                 <a href="{{ route('les_posts_SG') }}"
                     class="nav-item {{ request()->routeIs('les_posts_SG') ? 'active' : '' }}">
                     <i class="fas fa-briefcase"></i> Postes
+                </a>
+                <a href="{{ route('les_sanctions_SG') }}"
+                    class="nav-item {{ request()->routeIs('les_sanctions_SG') ? 'active' : '' }}">
+                    <i class="fas fa-shield-alt"></i> Sanctions
+                    <span class="badge bg-danger">{{ App\Models\sanction::count() }}</span>
                 </a>
                 <a href="{{ route('les_formations_SG') }}"
                     class="nav-item {{ request()->routeIs('les_formations_SG') ? 'active' : '' }}">
                     <i class="fas fa-chalkboard-teacher"></i> Formations
                 </a>
-                <a href="{{ route('les_annees_SG') }}"
-                    class="nav-item {{ request()->routeIs('les_annees_SG') ? 'active' : '' }}">
-                    <i class="fas fa-calendar-alt"></i> Années
-                </a>
+
                 <a href="{{ route('les_reglements_SG') }}"
                     class="nav-item {{ request()->routeIs('les_reglements_SG') ? 'active' : '' }}">
                     <i class="fas fa-book"></i> Règlements
@@ -1046,6 +1048,10 @@
                 <a href="{{ route('les_contacts_SG') }}"
                     class="nav-item {{ request()->routeIs('les_contacts_SG') ? 'active' : '' }}">
                     <i class="fas fa-address-book"></i>Contacts
+                </a>
+                <a href="{{ route('les_annees_SG') }}"
+                    class="nav-item {{ request()->routeIs('les_annees_SG') ? 'active' : '' }}">
+                    <i class="fas fa-calendar-alt"></i> Années
                 </a>
             </div>
         </div>
@@ -1102,7 +1108,7 @@
                 group.classList.toggle('collapsed', !expanded && !hasActiveItem);
                 if (toggle) {
                     toggle.setAttribute('aria-expanded', (!group.classList.contains('collapsed'))
-                    .toString());
+                        .toString());
                 }
 
                 if (hasActiveItem) {

@@ -19,6 +19,7 @@ class employe extends Model
         'niveau_etude',
         'user_id',
         'annee_id',
+        'emploiyeur',
     ];
 
     public function grade()
@@ -44,6 +45,10 @@ class employe extends Model
     public function affectations()
     {
         return $this->hasMany(affectation::class);
+    }
+    public function lectures()
+    {
+        return $this->hasMany(lecture::class);
     }
 
     public function dossiersEtude()

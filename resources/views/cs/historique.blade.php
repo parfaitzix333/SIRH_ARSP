@@ -423,7 +423,7 @@
                                     {{ $h->created_at?->format('d/m/Y H:i') }}
                                 </td>
 
-                                <td class="text-center">
+                                <td class="text-center" hidden="True">
                                     <form action="{{ route('historiques.destroy', $h->id) }}" method="POST"
                                         onsubmit="return confirm('Supprimer cet historique ?');" class="d-inline">
                                         @csrf

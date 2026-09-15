@@ -6,10 +6,14 @@ use App\Models\employe;
 use App\Models\annee;
 use App\Models\historique;
 use App\Models\User;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class UtilisateurController extends Controller
 {
@@ -383,5 +387,106 @@ class UtilisateurController extends Controller
                         . 'Veuillez réessayer.',
                 ]);
         }
+    }
+
+    public function form_employe_register()
+    {
+        return view('auth.form_employe_register');
+    }
+
+    public function form_employe_login()
+    {
+        return view('auth.login_employe');
+    }
+
+    public function employe_register(Request $request)
+    {
+        $userData = $request->validate([
+            'name' => 'nullable|string', // Optionnel car on va utiliser le nom de l'employé
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|confirmed|min:6',
+            'matricule' => 'required|string|exists:employes,matricule' // Correction de 'stricg' et ajout exists
+        ]);
+
+        // Récupérer l'employé
+        $employe = employe::where('matricule', $userData['matricule'])->first();
+
+        if (!$employe) {
+            return redirect()->back()->withErrors(['matricule' => 'Ce matricule est inconnu!'])->withInput();
+        }
+
+        // Vérifier si l'employé a déjà un compte
+        if ($employe->user_id) {
+            return redirect()->back()->withErrors(['matricule' => 'Cet employé a déjà un compte utilisateur!'])->withInput();
+        }
+
+        // Créer l'utilisateur
+        $user = User::create([
+            'name' => $employe->nom  ?? '',
+            'email' => $userData['email'],
+            'password' => Hash::make($userData['password']),
+            'matricule' => $userData['matricule'],
+            'role' => 'Employe',
+        ]);
+
+        // Associer l'utilisateur à l'employé
+        $employe->user_id = $user->id;
+        $employe->save();
+
+        // Déclencher l'événement d'enregistrement
+        event(new Registered($user));
+
+        // Connecter l'utilisateur
+        Auth::login($user);
+
+        return redirect()->route('dashboard')->with('success', 'Compte créé avec succès!');
+    }
+    //connexion d'un employé avec son matricule
+    public function employe_login(Request $request)
+    {
+        $credentials = $request->validate([
+            'matricule' => ['required', 'string', 'max:50'],
+            'password' => ['required', 'string', 'min:4'],
+        ], [
+            'matricule.required' => 'Le matricule est obligatoire.',
+            'matricule.string' => 'Le matricule doit être une chaîne de caractères.',
+            'password.required' => 'Le mot de passe est obligatoire.',
+            'password.min' => 'Le mot de passe doit contenir au moins 4 caractères.',
+        ]);
+
+        $throttleKey = Str::transliterate(
+            Str::lower($credentials['matricule']) . '|' . $request->ip()
+        );
+
+        if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
+            $seconds = RateLimiter::availableIn($throttleKey);
+
+            throw ValidationException::withMessages([
+                'matricule' => "Trop de tentatives de connexion. Veuillez réessayer dans {$seconds} secondes.",
+            ]);
+        }
+
+        $user = User::where('matricule', $credentials['matricule'])->first();
+
+        if (!$user || !Hash::check($credentials['password'], $user->password)) {
+            RateLimiter::hit($throttleKey, 60);
+
+            throw ValidationException::withMessages([
+                'matricule' => 'Les identifiants fournis sont incorrects.',
+            ]);
+        }
+
+        if (isset($user->role) && $user->role !== 'Employe') {
+            throw ValidationException::withMessages([
+                'matricule' => 'Ce compte n\'est pas autorisé à se connecter comme employé.',
+            ]);
+        }
+
+        Auth::login($user, $request->boolean('remember'));
+        RateLimiter::clear($throttleKey);
+        $request->session()->regenerate();
+
+        return redirect()->intended(route('accueil_employe'))
+            ->with('success', 'Bienvenue ' . ($user->name ?? 'employé') . ' !');
     }
 }

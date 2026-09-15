@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('role')->default('user');
             $table->boolean('autorisation')->default(false);
             $table->string('email')->unique();
+            $table->string('matricule')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->foreignId('annee_id')->nullable();

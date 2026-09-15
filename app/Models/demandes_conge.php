@@ -18,6 +18,10 @@ class demandes_conge extends Model
         'date_validation',
         'commentaire_validation',
         'annee_id',
+        'valide_national',
+        'valide_secDg',
+        'valide_serv',
+        'piece_justificative',
     ];
 
     protected $casts = [

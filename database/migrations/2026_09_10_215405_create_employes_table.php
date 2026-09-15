@@ -27,6 +27,8 @@ return new class extends Migration
             $table->foreignId('user_id')
                 ->nullable()
                 ->constrained('users');
+            $table->string('emploiyeur')
+                ->default('ARSP');
 
             $table->foreignId('annee_id')
                 ->constrained('annees');

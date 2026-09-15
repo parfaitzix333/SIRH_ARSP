@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Concerns\HandlesCrudHistory;
 use App\Models\User;
 use App\Models\communique;
+use App\Models\employe;
+use App\Models\lecture;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -34,6 +36,29 @@ class CommuniqueController extends Controller
 
         if (is_string($roleCible) && strtolower($roleCible) === 'tous') {
             $request->merge(['role_cible' => 'tous']);
+        }
+    }
+
+    private function syncLecturesForCommunique(communique $item): void
+    {
+        $item->lectures()->delete();
+
+        $query = User::with('employes');
+
+        if ($item->role_cible !== 'tous') {
+            $query->where('role', $item->role_cible);
+        }
+
+        $users = $query->get();
+
+        foreach ($users as $user) {
+            foreach ($user->employes as $employe) {
+                lecture::firstOrCreate([
+                    'employe_id' => $employe->id,
+                    'communique_id' => $item->id,
+                    'annee_id' => $item->annee_id,
+                ]);
+            }
         }
     }
 
@@ -68,9 +93,14 @@ class CommuniqueController extends Controller
             $data['piece_jointe'] = $request->file('piece_jointe')->store('communiques', 'public');
         }
 
-        $item = communique::create($data);
-        $this->historique('Création du communiqué : ' . $item->titre, $item->annee_id);
-        return back()->with('success', 'Communiqué créé avec succès.');
+        try {
+            $item = communique::create($data);
+            $this->syncLecturesForCommunique($item);
+            $this->historique('Création du communiqué : ' . $item->titre, $item->annee_id);
+            return back()->with('success', 'Communiqué créé avec succès.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Une erreur est survenue lors de la création du communiqué : ' . $e->getMessage());
+        }
     }
 
     public function update(Request $request, $id)
@@ -90,6 +120,7 @@ class CommuniqueController extends Controller
         }
 
         $item->update($data);
+        $this->syncLecturesForCommunique($item);
         $this->historique('Mise à jour du communiqué : ' . $item->titre, $item->annee_id);
         return back()->with('success', 'Communiqué mis à jour avec succès.');
     }
@@ -113,6 +144,8 @@ class CommuniqueController extends Controller
         $title = $item->titre;
         $anneeId = $item->annee_id;
 
+        $item->lectures()->delete();
+
         if ($item->piece_jointe && Storage::disk('public')->exists($item->piece_jointe)) {
             Storage::disk('public')->delete($item->piece_jointe);
         }
@@ -120,5 +153,24 @@ class CommuniqueController extends Controller
         $item->delete();
         $this->historique('Suppression du communiqué : ' . $title, $anneeId);
         return back()->with('success', 'Communiqué supprimé avec succès.');
+    }
+    public function lecture($id)
+    {
+        $user = Auth::user();
+        $employe = employe::where('user_id', $user->id)->firstOrFail();
+
+        $lecture = lecture::whereKey($id)
+            ->where('employe_id', $employe->id)
+            ->with('communique')
+            ->firstOrFail();
+
+        if ($lecture->lu == false) {
+            $lecture->update([
+                'lu' => true,
+                'lu_a' => now(),
+            ]);
+        }
+
+        return view('emp.lecture_comm', compact('lecture'));
     }
 }

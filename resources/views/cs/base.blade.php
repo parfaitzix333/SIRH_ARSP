@@ -967,11 +967,7 @@
                     class="nav-item {{ request()->routeIs('les_disciplines_CS') ? 'active' : '' }}">
                     <i class="fas fa-gavel"></i> Disciplines
                 </a>
-                <a href="{{ route('les_sanctions_CS') }}"
-                    class="nav-item {{ request()->routeIs('les_sanctions_CS') ? 'active' : '' }}" hidden="True">
-                    <i class="fas fa-shield-alt"></i> Sanctions
-                    <span class="badge bg-danger">{{ App\Models\sanction::count() }}</span>
-                </a>
+
             </div>
         </div>
 
@@ -992,6 +988,11 @@
                 <a href="{{ route('les_posts_CS') }}"
                     class="nav-item {{ request()->routeIs('les_posts_CS') ? 'active' : '' }}">
                     <i class="fas fa-briefcase"></i> Postes
+                </a>
+                <a href="{{ route('les_sanctions_CS') }}"
+                    class="nav-item {{ request()->routeIs('les_sanctions_CS') ? 'active' : '' }}" hidden="True">
+                    <i class="fas fa-shield-alt"></i> Sanctions
+                    <span class="badge bg-danger">{{ App\Models\sanction::count() }}</span>
                 </a>
                 <a href="{{ route('les_formations_CS') }}"
                     class="nav-item {{ request()->routeIs('les_formations_CS') ? 'active' : '' }}">
@@ -1019,7 +1020,7 @@
             </button>
             <div class="nav-group-items">
                 <a href="{{ route('les_utilisateurs_CS') }}"
-                    class="nav-item {{ request()->routeIs('les_utilisateurs_CS') ? 'active' : '' }}">
+                    class="nav-item {{ request()->routeIs('les_utilisateurs_CS') ? 'active' : '' }}" hidden="True">
                     <i class="fas fa-user-shield"></i> Utilisateurs
                     @php
                         try {

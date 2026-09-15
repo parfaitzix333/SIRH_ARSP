@@ -20,6 +20,11 @@ return new class extends Migration
             $table->date('date_debut');
             $table->date('date_fin');
             $table->integer('nombre_jour');
+            $table->boolean('valide_national')->default(false);
+            $table->boolean('valide_secDg')->default(false);
+            $table->boolean('valide_serv')->default(false);
+            $table->string('piece_justificative')->nullable();
+            $table->date('date_validation')->nullable();
 
             $table->text('motif')->nullable();
 

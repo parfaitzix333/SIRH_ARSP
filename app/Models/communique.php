@@ -25,4 +25,8 @@ class communique extends Model
     {
         return $this->belongsTo(annee::class);
     }
+    public function lectures()
+    {
+        return $this->hasMany(lecture::class, 'communique_id');
+    }
 }
