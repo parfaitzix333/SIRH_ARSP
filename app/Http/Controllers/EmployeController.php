@@ -18,7 +18,7 @@ class EmployeController extends Controller
     use HandlesCrudHistory;
     private function rules(?int $ignoreId = null): array
     {
-        return ['matricule' => ['required', 'string', 'max:50', Rule::unique('employes', 'matricule')->ignore($ignoreId)], 'nom' => ['required', 'string', 'max:150'], 'grade_id' => ['nullable', 'exists:grades,id'], 'service_id' => ['nullable', 'exists:services,id'], 'date_naissance' => ['nullable', 'date'], 'lieu_naissance' => ['nullable', 'string', 'max:150'], 'province_origine' => ['nullable', 'string', 'max:150'], 'territoire' => ['nullable', 'string', 'max:150'], 'localite' => ['nullable', 'string', 'max:150'], 'niveau_etude' => ['nullable', 'string', 'max:150'], 'user_id' => ['nullable', 'exists:users,id'], 'annee_id' => ['required', 'exists:annees,id']];
+        return ['matricule' => ['required', 'string', 'max:50', Rule::unique('employes', 'matricule')->ignore($ignoreId)], 'nom' => ['required', 'string', 'max:150'], 'grade_id' => ['nullable', 'exists:grades,id'], 'service_id' => ['nullable', 'exists:services,id'], 'date_naissance' => ['nullable', 'date'], 'date_engagement' => ['nullable', 'date'], 'lieu_naissance' => ['nullable', 'string', 'max:150'], 'province_origine' => ['nullable', 'string', 'max:150'], 'territoire' => ['nullable', 'string', 'max:150'], 'localite' => ['nullable', 'string', 'max:150'], 'niveau_etude' => ['nullable', 'string', 'max:150'], 'user_id' => ['nullable', 'exists:users,id'], 'annee_id' => ['required', 'exists:annees,id']];
     }
     public function store(Request $request)
     {

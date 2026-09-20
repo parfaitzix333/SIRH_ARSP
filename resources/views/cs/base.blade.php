@@ -922,6 +922,10 @@
                     class="nav-item {{ request()->routeIs('les_affectations_CS') ? 'active' : '' }}">
                     <i class="fas fa-sitemap"></i> Affectations
                 </a>
+                <a href="{{ route('les_interims_CS') }}"
+                    class="nav-item {{ request()->routeIs('les_interims_CS') ? 'active' : '' }}">
+                    <i class="fas fa-user-tie"></i> Intérims
+                </a>
                 <a href="{{ route('les_presences_CS') }}"
                     class="nav-item {{ request()->routeIs('les_presences_CS') ? 'active' : '' }}">
                     <i class="fas fa-user-clock"></i> Présences

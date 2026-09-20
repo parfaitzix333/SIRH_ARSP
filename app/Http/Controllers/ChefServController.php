@@ -17,6 +17,7 @@ use App\Models\employe;
 use App\Models\formation;
 use App\Models\formation_employe;
 use App\Models\historique;
+use App\Models\interime;
 use App\Models\mouvement;
 use App\Models\poste;
 use App\Models\presence;
@@ -97,7 +98,16 @@ class ChefServController extends Controller
 
     public function les_demandes_conge()
     {
-        return $this->vueAvecCollection('les_demandes_conge', 'les_demandes_conge', demandes_conge::class);
+        $user = Auth::user();
+        $annee = $this->anneeCourante();
+        $les_demandes_conge = $annee
+            ? demandes_conge::with(['employe', 'interimaire', 'conge', 'validePar', 'annee'])
+            ->where('annee_id', $annee->id)
+            ->latest()
+            ->get()
+            : collect();
+
+        return view('cs.les_demandes_conge', compact('user', 'les_demandes_conge'));
     }
 
     public function les_conges()
@@ -131,6 +141,20 @@ class ChefServController extends Controller
     public function les_affectations()
     {
         return $this->vueAvecCollection('les_affectations', 'les_affectations', affectation::class);
+    }
+
+    public function les_interims()
+    {
+        $user = Auth::user();
+        $annee = $this->anneeCourante();
+        $les_interims = $annee
+            ? interime::with(['employe', 'interimaire', 'annee'])
+            ->where('annee_id', $annee->id)
+            ->latest()
+            ->get()
+            : collect();
+
+        return view('cs.les_interims', compact('user', 'les_interims', 'annee'));
     }
 
     public function historique()

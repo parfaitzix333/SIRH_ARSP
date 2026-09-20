@@ -17,6 +17,7 @@ use App\Models\employe;
 use App\Models\formation;
 use App\Models\formation_employe;
 use App\Models\historique;
+use App\Models\interime;
 use App\Models\mouvement;
 use App\Models\poste;
 use App\Models\presence;
@@ -26,6 +27,8 @@ use App\Models\reglement;
 use App\Models\sanction;
 use App\Models\service;
 use App\Models\User;
+use Carbon\Carbon;
+use Carbon\CarbonPeriod;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -97,7 +100,15 @@ class DgController extends Controller
 
     public function les_demandes_conge()
     {
-        return $this->vueAvecCollection('les_demandes_conge', 'les_demandes_conge', demandes_conge::class);
+        $user = Auth::user();
+        $les_demandes_conge = $this->anneeCourante()
+            ? demandes_conge::with(['employe', 'interimaire', 'conge', 'validePar', 'annee'])
+            ->where('annee_id', $this->anneeCourante()->id)
+            ->latest()
+            ->get()
+            : collect();
+
+        return view('dg.les_demandes_conge', compact('user', 'les_demandes_conge'));
     }
 
     public function les_conges()
@@ -131,6 +142,20 @@ class DgController extends Controller
     public function les_affectations()
     {
         return $this->vueAvecCollection('les_affectations', 'les_affectations', affectation::class);
+    }
+
+    public function les_interims()
+    {
+        $user = Auth::user();
+        $annee = $this->anneeCourante();
+        $les_interims = $annee
+            ? interime::with(['employe', 'interimaire', 'annee'])
+            ->where('annee_id', $annee->id)
+            ->latest()
+            ->get()
+            : collect();
+
+        return view('dg.les_interims', compact('user', 'les_interims', 'annee'));
     }
 
     public function historique()
@@ -228,5 +253,85 @@ class DgController extends Controller
         ${$variable} = $this->parAnnee($model);
 
         return view('dg.' . $vue, compact('user', $variable));
+    }
+
+    public function etat_general_employes($id_emp)
+    {
+        $user = Auth::user();
+        $annee = $this->anneeCourante() ?? annee::where('statut', 'active')->first();
+        $anneeNumero = $annee?->annee ?? now()->year;
+        $employe = employe::with([
+            'grade',
+            'service',
+            'annee',
+            'affectations' => fn($query) => $query->with(['service', 'categorie', 'poste', 'annee'])
+                ->orderByDesc('date_debut'),
+            'audits' => fn($query) => $query->where('annee_id', $annee?->id)->latest('date_debut_service'),
+            'demandesConges' => fn($query) => $query->with('conge', 'annee')->latest('date_debut'),
+            'disciplines' => fn($query) => $query->with('sanction', 'annee')->latest('DATE'),
+            'mouvements' => fn($query) => $query->with('annee')->latest(),
+            'dossiersEtude' => fn($query) => $query->with('annee')->latest(),
+        ])->findOrFail($id_emp);
+
+        $debutAnnee = Carbon::create($anneeNumero, 1, 1)->startOfDay();
+        $finAnnee = Carbon::create($anneeNumero, 12, 31)->endOfDay();
+        $dateLimite = $anneeNumero === now()->year ? now()->endOfDay() : $finAnnee;
+        $presences = $employe->presences()
+            ->whereBetween('DATE', [$debutAnnee, $dateLimite])
+            ->get(['DATE']);
+        $presenceDates = $presences->map(fn($presence) => Carbon::parse($presence->DATE)->toDateString())->unique();
+        $presencesMensuelles = collect(range(1, 12))->map(function ($mois) use ($anneeNumero, $dateLimite, $presenceDates) {
+            $debut = Carbon::create($anneeNumero, $mois, 1)->startOfDay();
+            $fin = $debut->copy()->endOfMonth()->min($dateLimite);
+            if ($debut->greaterThan($dateLimite)) {
+                return ['mois' => $mois, 'presences' => 0, 'absences' => 0];
+            }
+
+            $joursOuvres = collect(CarbonPeriod::create($debut, $fin))
+                ->filter(fn($jour) => Carbon::parse((string) $jour)->isWeekday())
+                ->count();
+            $presencesMois = $presenceDates->filter(fn($date) => Carbon::parse($date)->month === $mois)->count();
+
+            return [
+                'mois' => $mois,
+                'presences' => $presencesMois,
+                'absences' => max(0, $joursOuvres - $presencesMois),
+            ];
+        });
+
+        return view('dg.etat_general_employe', [
+            'user' => $user,
+            'employe' => $employe,
+            'annee' => $annee,
+            'audit' => $employe->audits->first(),
+            'affectation' => $employe->affectations->first(),
+            'presencesMensuelles' => $presencesMensuelles,
+            'presencesAnnuelles' => $presenceDates->count(),
+            'absencesAnnuelles' => $presencesMensuelles->sum('absences'),
+        ]);
+    }
+
+    public function fiche_de_demande_conge($id)
+    {
+        abort_unless(Auth::user()?->role === 'DG', 403);
+        $user = Auth::user();
+        $demande = demandes_conge::with(['employe', 'interimaire', 'conge', 'validePar', 'annee'])
+            ->where('valide_secDg', true)
+            ->findOrFail($id);
+        $annees = annee::orderBy('annee')->get(['id', 'annee']);
+        $joursParAnnee = demandes_conge::query()
+            ->where('employe_id', $demande->employe_id)
+            ->where('valide_secDg', true)
+            ->whereNotIn('statut', ['annulee', 'refusee'])
+            ->get(['annee_id', 'nombre_jour'])
+            ->groupBy('annee_id')
+            ->map(fn($demandes) => (int) $demandes->sum('nombre_jour'));
+        $exercices = $annees->map(fn($annee) => [
+            'annee' => $annee->annee,
+            'jours' => $joursParAnnee->get($annee->id, 0),
+        ]);
+        $cumulJours = $exercices->sum('jours');
+
+        return view('secdg.fiche_de_demande_conge', compact('user', 'demande', 'exercices', 'cumulJours'));
     }
 }

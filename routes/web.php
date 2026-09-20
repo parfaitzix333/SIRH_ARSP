@@ -30,6 +30,7 @@ use App\Http\Controllers\DgController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SecDgController;
 use App\Http\Controllers\UtilisateurController;
+use App\Http\Controllers\InterimeController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -96,7 +97,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/les_sanctions', [DgController::class, 'les_sanctions'])->name('les_sanctions');
     Route::get('/les_services', [DgController::class, 'les_services'])->name('les_services');
     Route::get('/les_utilisateurs', [DgController::class, 'les_utilisateurs'])->name('les_utilisateurs');
-    //========================================================
+    Route::get('/les_interims', [DgController::class, 'les_interims'])->name('les_interims');
+    Route::get('/etat_general_employes/{id_emp}', [DgController::class, 'etat_general_employes'])->name('etat_general_employes');
+    Route::get('/fiche_de_demande_conge_dg/{id}', [DgController::class, 'fiche_de_demande_conge'])->name('fiche_de_demande_conge_dg');
+    //=======================================================
 
 
 
@@ -139,7 +143,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/les_sanctions_CD', [ChefDivController::class, 'les_sanctions'])->name('les_sanctions_CD');
     Route::get('/les_services_CD', [ChefDivController::class, 'les_services'])->name('les_services_CD');
     Route::get('/les_utilisateurs_CD', [ChefDivController::class, 'les_utilisateurs'])->name('les_utilisateurs_CD');
-    Route::get('/fiche_de_demande_conge/{id}', [ChefDivController::class, 'fiche_de_demande_conge'])->name('fiche_de_demande_conge');
+    Route::get('/fiche_de_demande_conge_cd/{id}', [ChefDivController::class, 'fiche_de_demande_conge'])->name('fiche_de_demande_conge_cd');
     Route::get('/les_grades_CD', [ChefDivController::class, 'les_grades'])->name('les_grades_CD');
     //========================================================
 
@@ -182,7 +186,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/les_sanctions_SG', [SecDgController::class, 'les_sanctions'])->name('les_sanctions_SG');
     Route::get('/les_services_SG', [SecDgController::class, 'les_services'])->name('les_services_SG');
     Route::get('/les_utilisateurs_SG', [SecDgController::class, 'les_utilisateurs'])->name('les_utilisateurs_SG');
-    Route::get('/fiche_de_demande_conge/{id}', [SecDgController::class, 'fiche_de_demande_conge'])->name('fiche_de_demande_conge');
+    Route::get('/les_interims_SG', [SecDgController::class, 'les_interims'])->name('les_interims_SG');
+    Route::get('/fiche_de_demande_conge_sg/{id}', [SecDgController::class, 'fiche_de_demande_conge'])->name('fiche_de_demande_conge_sg');
     Route::get('/les_grades_SG', [SecDgController::class, 'les_grades'])->name('les_grades_SG');
     //==========================================================
 
@@ -220,6 +225,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/les_sanctions_CS', [ChefServController::class, 'les_sanctions'])->name('les_sanctions_CS');
     Route::get('/les_services_CS', [ChefServController::class, 'les_services'])->name('les_services_CS');
     Route::get('/les_utilisateurs_CS', [ChefServController::class, 'les_utilisateurs'])->name('les_utilisateurs_CS');
+    Route::get('/les_interims_CS', [ChefServController::class, 'les_interims'])->name('les_interims_CS');
 
     //Les route resource
     Route::resource('annees', AnneeController::class)
@@ -264,6 +270,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('dossiers-etudes', DossiersEtudeController::class)->only(['store', 'update', 'destroy']);
     Route::resource('mouvements', MouvementController::class)->only(['store', 'update', 'destroy']);
     Route::resource('employes', EmployeController::class)->only(['store', 'update', 'destroy']);
+    Route::resource('interimes', InterimeController::class)->only(['store', 'update', 'destroy']);
     Route::resource('affectations', AffectationController::class)->only(['store', 'update', 'destroy']);
     Route::get('/formations-employes/file/{path}', [FormationEmployeController::class, 'viewAttachment'])
         ->where('path', '.*')

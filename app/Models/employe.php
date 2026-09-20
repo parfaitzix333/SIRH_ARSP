@@ -12,6 +12,7 @@ class employe extends Model
         'grade_id',
         'service_id',
         'date_naissance',
+        'date_engagement',
         'lieu_naissance',
         'province_origine',
         'territoire',
@@ -20,6 +21,11 @@ class employe extends Model
         'user_id',
         'annee_id',
         'emploiyeur',
+    ];
+
+    protected $casts = [
+        'date_naissance' => 'date',
+        'date_engagement' => 'date',
     ];
 
     public function grade()

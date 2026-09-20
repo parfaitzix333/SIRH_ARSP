@@ -922,6 +922,10 @@
                     class="nav-item {{ request()->routeIs('les_affectations') ? 'active' : '' }}">
                     <i class="fas fa-sitemap"></i> Affectations
                 </a>
+                <a href="{{ route('les_interims') }}"
+                    class="nav-item {{ request()->routeIs('les_interims') ? 'active' : '' }}">
+                    <i class="fas fa-user-tie"></i> Intérims
+                </a>
                 <a href="{{ route('les_presences') }}"
                     class="nav-item {{ request()->routeIs('les_presences') ? 'active' : '' }}">
                     <i class="fas fa-user-clock"></i> Présences
@@ -1101,7 +1105,7 @@
                 group.classList.toggle('collapsed', !expanded && !hasActiveItem);
                 if (toggle) {
                     toggle.setAttribute('aria-expanded', (!group.classList.contains('collapsed'))
-                    .toString());
+                        .toString());
                 }
 
                 if (hasActiveItem) {

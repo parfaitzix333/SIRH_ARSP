@@ -18,6 +18,7 @@ use App\Models\formation;
 use App\Models\formation_employe;
 use App\Models\grade;
 use App\Models\historique;
+use App\Models\interime;
 use App\Models\mouvement;
 use App\Models\poste;
 use App\Models\presence;
@@ -105,6 +106,7 @@ class SecDgController extends Controller
                 'employe.grade',
                 'employe.service',
                 'employe.audits',
+                'interimaire',
                 'conge',
                 'validePar',
                 'annee',
@@ -149,6 +151,20 @@ class SecDgController extends Controller
     public function les_affectations()
     {
         return $this->vueAvecCollection('les_affectations', 'les_affectations', affectation::class);
+    }
+
+    public function les_interims()
+    {
+        $user = Auth::user();
+        $annee = $this->anneeCourante();
+        $les_interims = $annee
+            ? interime::with(['employe', 'interimaire', 'annee'])
+            ->where('annee_id', $annee->id)
+            ->latest()
+            ->get()
+            : collect();
+
+        return view('secdg.les_interims', compact('user', 'les_interims', 'annee'));
     }
 
     public function historique()
@@ -269,10 +285,23 @@ class SecDgController extends Controller
     {
         abort_unless(Auth::user()?->role === 'SecDG', 403);
         $user = Auth::user();
-        $demande = demandes_conge::with(['employe', 'conge', 'validePar', 'annee'])
+        $demande = demandes_conge::with(['employe', 'interimaire', 'conge', 'validePar', 'annee'])
             ->where('valide_secDg', true)
             ->findOrFail($id);
+        $annees = annee::orderBy('annee')->get(['id', 'annee']);
+        $joursParAnnee = demandes_conge::query()
+            ->where('employe_id', $demande->employe_id)
+            ->where('valide_secDg', true)
+            ->whereNotIn('statut', ['annulee', 'refusee'])
+            ->get(['annee_id', 'nombre_jour'])
+            ->groupBy('annee_id')
+            ->map(fn($demandes) => (int) $demandes->sum('nombre_jour'));
+        $exercices = $annees->map(fn($annee) => [
+            'annee' => $annee->annee,
+            'jours' => $joursParAnnee->get($annee->id, 0),
+        ]);
+        $cumulJours = $exercices->sum('jours');
 
-        return view('secdg.fiche_de_demande_conge', compact('user', 'demande'));
+        return view('secdg.fiche_de_demande_conge', compact('user', 'demande', 'exercices', 'cumulJours'));
     }
 }

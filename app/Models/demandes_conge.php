@@ -8,6 +8,7 @@ class demandes_conge extends Model
 {
     protected $fillable = [
         'employe_id',
+        'interimaire_id',
         'conge_id',
         'date_debut',
         'date_fin',
@@ -33,6 +34,10 @@ class demandes_conge extends Model
     public function employe()
     {
         return $this->belongsTo(employe::class);
+    }
+    public function interimaire()
+    {
+        return $this->belongsTo(employe::class, 'interimaire_id');
     }
 
     public function conge()

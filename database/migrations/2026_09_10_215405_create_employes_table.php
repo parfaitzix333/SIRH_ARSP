@@ -18,6 +18,7 @@ return new class extends Migration
             $table->foreignId('service_id')
                 ->nullable();
             $table->date('date_naissance')->nullable();
+            $table->date('date_engagement')->nullable();
             $table->string('lieu_naissance', 150)->nullable();
             $table->string('province_origine', 150)->nullable();
             $table->string('territoire', 150)->nullable();

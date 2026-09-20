@@ -13,7 +13,8 @@ return new class extends Migration
 
             $table->foreignId('employe_id')
                 ->constrained('employes');
-
+            $table->foreignId('interimaire_id')
+                ->constrained('employes')->nullable();
             $table->foreignId('conge_id')
                 ->constrained('conges');
 
@@ -24,6 +25,7 @@ return new class extends Migration
             $table->boolean('valide_secDg')->default(false);
             $table->boolean('valide_serv')->default(false);
             $table->string('piece_justificative')->nullable();
+
             $table->date('date_validation')->nullable();
 
             $table->text('motif')->nullable();

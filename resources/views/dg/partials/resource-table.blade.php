@@ -3,6 +3,7 @@
     $fields = $fields ?? [];
     $resource = $resource ?? null;
     $fileRoute = $fileRoute ?? 'communiques.file';
+    $detailRoute = $detailRoute ?? null;
     $formTitle = $formTitle ?? $title;
     $hasAnneeField = collect($fields)->contains('key', 'annee_id');
     $fieldOptions = function (array $field) {
@@ -203,6 +204,13 @@
                                 <td class="text-center">
                                     @if ($user->autorisation == true)
                                         <div class="resource-actions">
+                                            @if ($detailRoute)
+                                                <a href="{{ route($detailRoute, $item->id) }}"
+                                                    class="btn btn-outline-info" title="Voir la fiche complète"
+                                                    aria-label="Voir la fiche complète">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                            @endif
                                             <button type="button" class="btn btn-outline-primary"
                                                 data-bs-toggle="modal"
                                                 data-bs-target="#editResource{{ $item->id }}" title="Modifier"

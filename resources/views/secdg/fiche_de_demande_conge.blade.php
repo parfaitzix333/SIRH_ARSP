@@ -5,37 +5,142 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Fiche de demande de congé</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <style>
+        :root {
+            --blue: #bfe3ff;
+            --blue-dark: #9fd0ef;
+            --line: #000000;
+            --panel: #eef7ff;
+            --text: #1a1a1a;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
         body {
-            background: #f1f3f5;
-            color: #17202a;
+            margin: 0;
+            background: #f3f4f6;
+            font-family: Arial, Helvetica, sans-serif;
+            color: var(--text);
         }
 
         .sheet {
-            max-width: 900px;
-            margin: 2rem auto;
+            width: 1000px;
+            margin: 18px auto;
             background: #fff;
-            padding: 3rem;
-            box-shadow: 0 4px 18px rgba(0, 0, 0, .12);
+            border: 2px solid var(--line);
         }
 
-        .signature {
-            min-height: 180px;
-            border: 1px solid #adb5bd;
-            padding: 1rem;
+        .sheet-header {
+            background: var(--blue);
+            border-bottom: 2px solid var(--line);
+            text-align: center;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 10px 12px;
+            font-size: 18px;
+            letter-spacing: 0.5px;
+        }
+
+        .year-bar {
+            text-align: center;
+            background: var(--blue);
+            border-bottom: 2px solid var(--line);
+            padding: 3px 10px 8px;
+            font-weight: 700;
+            font-size: 18px;
+            text-transform: uppercase;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        th,
+        td {
+            border: 1px solid var(--line);
+            padding: 6px 8px;
+            font-size: 12px;
+            vertical-align: top;
+        }
+
+        .label {
+            background: var(--panel);
+            font-weight: 700;
+            width: 18%;
+        }
+
+        .sub-title {
+            background: var(--blue-dark);
+            text-align: center;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 6px 8px;
+            border: 1px solid var(--line);
+            border-top: none;
+            font-size: 12px;
+        }
+
+        .details thead th {
+            background: var(--blue);
+            color: #000;
+            text-align: center;
+            font-weight: 700;
+            font-size: 12px;
+        }
+
+        .details td {
+            height: 25px;
+            text-align: left;
+        }
+
+        .exercise-row td:first-child {
+            font-weight: 700;
+        }
+
+        .signature-table {
+            margin-top: 12px;
+        }
+
+        .signature-table th {
+            background: var(--blue);
+            font-weight: 700;
+            text-align: center;
+            font-size: 12px;
+        }
+
+        .signature-cell {
+            height: 120px;
+            position: relative;
+            background: #fff;
         }
 
         .signature-name {
-            margin-top: 7rem;
-            font-weight: 600;
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 8px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 12px;
         }
 
-        .document-logo {
-            width: 72px;
-            height: 72px;
-            object-fit: cover;
-            border-radius: 50%;
+        .no-print {
+            text-align: center;
+            padding: 12px;
+        }
+
+        .btn-print {
+            border: 1px solid #1d4ed8;
+            background: #2563eb;
+            color: #fff;
+            padding: 8px 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
         }
 
         @media print {
@@ -44,10 +149,9 @@
             }
 
             .sheet {
+                width: 100%;
                 margin: 0;
-                max-width: none;
-                box-shadow: none;
-                padding: 1rem;
+                border: none;
             }
 
             .no-print {
@@ -60,105 +164,236 @@
 <body>
     @php
         $employe = $demande->employe;
+        $interimaire = $demande->interimaire;
         $audit = $employe?->audits?->where('annee_id', $demande->annee_id)?->sortByDesc('date_debut_service')?->first();
+        $audit2 = $interimaire?->audits
+            ?->where('annee_id', $demande->annee_id)
+            ?->sortByDesc('date_debut_service')
+            ?->first();
+        $anneeActuelle = $demande->annee?->annee ?? now()->year;
+        $conges = [
+            [
+                'type' => '1. Congé annuel',
+                'duree' => '15 jours',
+                'date_depart' => $demande->date_debut?->format('d/m/Y') ?? '',
+                'date_retour' => $demande->date_fin?->format('d/m/Y') ?? '',
+                'jours_restants' => '',
+                'obs' => '',
+                'check' => '',
+            ],
+            [
+                'type' => '2. Congé de maternité',
+                'duree' => '8 semaines',
+                'date_depart' => '',
+                'date_retour' => '',
+                'jours_restants' => '',
+                'obs' => '',
+                'check' => '',
+            ],
+            [
+                'type' => '3. Congés de circonstance',
+                'duree' => 'Max 15 jours/an',
+                'date_depart' => '',
+                'date_retour' => '',
+                'jours_restants' => '',
+                'obs' => '',
+                'check' => '',
+            ],
+            [
+                'type' => '• Accouchement Épouse',
+                'duree' => '2 jours',
+                'date_depart' => '',
+                'date_retour' => '',
+                'jours_restants' => '',
+                'obs' => '',
+                'check' => '',
+            ],
+            [
+                'type' => '• Mariage de l’agent',
+                'duree' => '4 jours',
+                'date_depart' => '',
+                'date_retour' => '',
+                'jours_restants' => '',
+                'obs' => '',
+                'check' => '',
+            ],
+            [
+                'type' => '• Mariage d’un enfant',
+                'duree' => '2 jours',
+                'date_depart' => '',
+                'date_retour' => '',
+                'jours_restants' => '',
+                'obs' => '',
+                'check' => '',
+            ],
+            [
+                'type' => '• Décès d’1 conjoint/parent 1er degré',
+                'duree' => '6 jours',
+                'date_depart' => '',
+                'date_retour' => '',
+                'jours_restants' => '',
+                'obs' => '',
+                'check' => '',
+            ],
+            [
+                'type' => '• Décès parent 2e degré',
+                'duree' => '2 jours',
+                'date_depart' => '',
+                'date_retour' => '',
+                'jours_restants' => '',
+                'obs' => '',
+                'check' => '',
+            ],
+            [
+                'type' => '• Déménagement',
+                'duree' => '2 jours',
+                'date_depart' => '',
+                'date_retour' => '',
+                'jours_restants' => '',
+                'obs' => '',
+                'check' => '',
+            ],
+            [
+                'type' => '4. Congé sans solde',
+                'duree' => '10 jours',
+                'date_depart' => '',
+                'date_retour' => '',
+                'jours_restants' => '',
+                'obs' => '',
+                'check' => '',
+            ],
+        ];
     @endphp
 
-    <main class="sheet p-6">
-        <div class="d-flex justify-content-between align-items-start border-bottom pb-3 mb-4">
-            <div class="d-flex align-items-center gap-3">
-                <img src="{{ asset('image/logo.jpeg') }}" alt="Logo ARSP" class="document-logo">
-                <div>
-                    <strong>ARSP</strong><br>
-                    <small>Autorité de Régulation de la Sous-traitance dans le Secteur Privé</small>
-                </div>
-                <h2 class="text-primary">Province du Haut-Katanga</h2>
-            </div>
+    <main class="sheet">
+        <div class="sheet-header">Formulaire de demande de congé</div>
+        <div class="year-bar">Année {{ $anneeActuelle }}</div>
 
-            <div class="text-end"><strong>FICHE DE DEMANDE DE CONGÉ</strong><br><small>Référence :
-                    #{{ $demande->id }}</small></div>
-        </div>
-        <h4 class="text-center mb-4">Demande de congé</h4>
-        <table class="table table-bordered">
+        <table>
+            <tr>
+                <td class="label">Nom :</td>
+                <td>{{ $employe?->nom ?? '—' }}</td>
+                <td>Date d'engagement :</td>
+                <td>{{ $employe?->date_engagement?->format('d/m/Y') ?? '—' }}</td>
+            <tr>
+                <td class="label">Fonction :</td>
+                <td>{{ $audit?->role ?? '—' }}</td>
+                <td>Grade(CC,CB,CS,CD) :
+                </td>
+                <td>{{ $employe?->grade?->designation ?? '—' }}</td>
+
+            <tr>
+                <td class="label">Direction :</td>
+                <td>HAUT-KATANGA</td>
+                <td class="label">Matricule :</td>
+                <td>{{ $employe?->matricule ?? '—' }}</td>
+            </tr>
+            <tr>
+                <td class="label">Employeur :</td>
+                <td colspan="3">ARSP</td>
+            </tr>
+        </table>
+
+        <div class="sub-title">Interimaire</div>
+
+        <table>
+            <tr>
+                <td class="label">Nom :</td>
+                <td>{{ $interimaire?->nom ?? '—' }}</td>
+                <td class="label">Grade(CB,CS,CD) :</td>
+                <td>{{ $interimaire?->grade?->designation ?? '—' }}</td>
+            </tr>
+            <tr>
+                <td class="label">Fonction :</td>
+                <td>{{ $audit2?->role ?? '—' }}</td>
+                <td class="label">Matricule :</td>
+                <td>{{ $interimaire?->matricule ?? '—' }}</td>
+            </tr>
+        </table>
+
+        <table class="details" style="margin-top: 0;">
+            <thead>
+                <tr>
+                    <th style="width: 23%;">Type de Congé</th>
+                    <th style="width: 12%;">Durée lég./Contr.</th>
+                    <th style="width: 12%;">Date départ</th>
+                    <th style="width: 12%;">Date retour</th>
+                    <th style="width: 12%;">Jrs Restants</th>
+                    <th style="width: 12%;">Observation</th>
+                    <th style="width: 9%;">Check HR</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ($conges as $conge)
+                    <tr>
+                        <td>{{ $conge['type'] }}</td>
+                        <td>{{ $conge['duree'] }}</td>
+                        <td>{{ $conge['date_depart'] }}</td>
+                        <td>{{ $conge['date_retour'] }}</td>
+                        <td>{{ $conge['jours_restants'] }}</td>
+                        <td>{{ $conge['obs'] }}</td>
+                        <td>{{ $conge['check'] }}</td>
+                    </tr>
+                    @if ($loop->first)
+                        @foreach ($exercices as $exercice)
+                            <tr class="exercise-row">
+                                <td>* Exercice {{ $exercice['annee'] }}</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td>{{ $exercice['jours'] }} jour(s)</td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        @endforeach
+                        <tr class="exercise-row">
+                            <td>* Cumul</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td>{{ $cumulJours }} jour(s)</td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    @endif
+                @endforeach
+            </tbody>
+        </table>
+
+        <table class="signature-table">
+            <thead>
+                <tr>
+                    <th style="width: 20%;">Agent</th>
+                    <th style="width: 20%;">Sup.Hiérarch.</th>
+                    <th style="width: 20%;">Directeur</th>
+                    <th style="width: 20%;">DRH</th>
+                    <th style="width: 20%;">Observations</th>
+                </tr>
+            </thead>
             <tbody>
                 <tr>
-                    <th>Employé</th>
-                    <td>{{ $demande->employe?->nom ?? '—' }}</td>
-                    <th>Matricule</th>
-                    <td>{{ $demande->employe?->matricule ?? '—' }}</td>
-                </tr>
-                <tr>
-                    <th>Employeur</th>
-                    <td colspan="3">Autorité de Régulation de la Sous-traitance dans le Secteur Privé (ARSP)</td>
-                </tr>
-                <tr>
-                    <th>Service</th>
-                    <td>{{ $employe?->service?->nom_service ?? '—' }}</td>
-                    <th>Grade</th>
-                    <td>{{ $employe?->grade?->designation ?? '—' }}</td>
-                </tr>
-                <tr>
-                    <th>Fonction</th>
-                    <td colspan="3">{{ $audit?->role ?? '—' }}</td>
-                </tr>
-                <tr>
-                    <th>Type de congé</th>
-                    <td>{{ $demande->conge?->designation ?? '—' }}</td>
-                    <th>Année</th>
-                    <td>{{ $demande->annee?->annee ?? '—' }}</td>
-                </tr>
-                <tr>
-                    <th>Date de début</th>
-                    <td>{{ $demande->date_debut?->format('d/m/Y') }}</td>
-                    <th>Date de fin</th>
-                    <td>{{ $demande->date_fin?->format('d/m/Y') }}</td>
-                </tr>
-                <tr>
-                    <th>Durée</th>
-                    <td>{{ $demande->nombre_jour }} jour(s)</td>
-                    <th>Statut</th>
-                    <td>{{ ucfirst($demande->statut) }}</td>
-                </tr>
-                <tr>
-                    <th>Motif</th>
-                    <td colspan="3">{{ $demande->motif ?: '—' }}</td>
+                    <td class="signature-cell">
+                        <div class="signature-name">Signature</div>
+                    </td>
+                    <td class="signature-cell">
+                        <div class="signature-name">Signature</div>
+                    </td>
+                    <td class="signature-cell">
+                        <div class="signature-name">Signature</div>
+                    </td>
+                    <td class="signature-cell">
+                        <div class="signature-name">Signature</div>
+                    </td>
+                    <td class="signature-cell">
+                        <div class="signature-name">{{ $demande->commentaire_validation ?: '—' }}</div>
+                    </td>
                 </tr>
             </tbody>
         </table>
-        <div class="mt-4"><strong>Observations :</strong>
-            <p class="border rounded p-3" style="min-height: 80px;">{{ $demande->commentaire_validation ?: '—' }}</p>
-        </div>
-        <div class="row g-4 mt-5 p-4">
-            <div class="col-3">
-                <div class="signature">
-                    <strong> de l'agent concerné</strong><br>
-                    <small>{{ $employe?->nom ?? 'Agent concerné' }}</small>
-                    <div class="signature-name">Signature</div>
-                </div>
-            </div>
-            <div class="col-3">
-                <div class="signature">
-                    <strong> DRH</strong><br>
 
-                    <div class="signature-name">Signature</div>
-                </div>
-            </div>
-            <div class="col-3">
-                <div class="signature">
-                    <strong> Sup.Hiérarch.</strong><br>
-                    <small>Signature et Sceau</small>
-                    <div class="signature-name">Sceau</div>
-                </div>
-            </div>
-            <div class="col-3">
-                <div class="signature">
-                    <strong>Directeur Général Provincial</strong><br>
-                    <small>Signature et sceau</small>
-                    <div class="signature-name"> Sceau</div>
-                </div>
-            </div>
+        <div class="no-print">
+            <button class="btn-print" onclick="window.print()">Imprimer</button>
         </div>
-        <div class="text-center mt-4 no-print"><button class="btn btn-primary" onclick="window.print()"><i
-                    class="fas fa-print me-1"></i> Imprimer</button></div>
     </main>
 </body>
 

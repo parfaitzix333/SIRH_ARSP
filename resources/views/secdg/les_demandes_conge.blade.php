@@ -24,6 +24,7 @@
                         <tr>
                             <th>#</th>
                             <th>Employé</th>
+                            <th>Intérimaire</th>
                             <th>Type</th>
                             <th>Période</th>
                             <th>Durée</th>
@@ -42,6 +43,7 @@
                                     <div class="fw-semibold">{{ $demande->employe?->nom ?? '—' }}</div>
                                     <small class="text-muted">{{ $demande->employe?->matricule ?? '—' }}</small>
                                 </td>
+                                <td>{{ $demande->interimaire?->nom ?? '—' }}</td>
                                 <td>{{ $demande->conge?->designation ?? '—' }}</td>
                                 <td class="text-nowrap">{{ $demande->date_debut?->format('d/m/Y') }} au
                                     {{ $demande->date_fin?->format('d/m/Y') }}</td>
@@ -74,7 +76,7 @@
                                         </button>
                                     @endif
                                     @if ($demande->valide_secDg)
-                                        <a href="{{ route('fiche_de_demande_conge', $demande->id) }}"
+                                        <a href="{{ route('fiche_de_demande_conge_sg', $demande->id) }}"
                                             class="btn btn-outline-primary btn-sm" title="Ouvrir la fiche">
                                             <i class="fas fa-file-lines"></i>
                                         </a>
@@ -97,7 +99,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="9" class="text-center text-muted py-5">Aucune demande validée par le Chef
+                                <td colspan="10" class="text-center text-muted py-5">Aucune demande validée par le Chef
                                     Service.</td>
                             </tr>
                         @endforelse
@@ -116,6 +118,16 @@
                         @csrf
                         @method('PUT')
                         <input type="hidden" name="employe_id" value="{{ $demande->employe_id }}">
+                        <div class="mb-3">
+                            <label class="form-label" for="interimaire_id_{{ $demande->id }}">Intérimaire</label>
+                            <select class="form-select" id="interimaire_id_{{ $demande->id }}" name="interimaire_id">
+                                <option value="">Aucun intérimaire</option>
+                                @foreach (\App\Models\employe::orderBy('nom')->get() as $employeOption)
+                                    <option value="{{ $employeOption->id }}" @selected($demande->interimaire_id === $employeOption->id)>
+                                        {{ $employeOption->nom }} ({{ $employeOption->matricule }})</option>
+                                @endforeach
+                            </select>
+                        </div>
                         <input type="hidden" name="conge_id" value="{{ $demande->conge_id }}">
                         <input type="hidden" name="nombre_jour" value="{{ $demande->nombre_jour }}">
                         <input type="hidden" name="annee_id" value="{{ $demande->annee_id }}">
@@ -181,6 +193,18 @@
                                         <option value="refusee">Refuser</option>
                                     </select>
                                 </div>
+                                <div class="mb-3">
+                                    <label class="form-label"
+                                        for="interimaire_decision_{{ $demande->id }}">Intérimaire</label>
+                                    <select name="interimaire_id" id="interimaire_decision_{{ $demande->id }}"
+                                        class="form-select">
+                                        <option value="">Aucun intérimaire</option>
+                                        @foreach (\App\Models\employe::orderBy('nom')->get() as $employeOption)
+                                            <option value="{{ $employeOption->id }}" @selected($demande->interimaire_id === $employeOption->id)>
+                                                {{ $employeOption->nom }} ({{ $employeOption->matricule }})</option>
+                                        @endforeach
+                                    </select>
+                                </div>
                                 <div class="form-check mb-2"><input class="form-check-input" type="checkbox"
                                         name="valide_secDg" value="1" id="sec_{{ $demande->id }}" checked><label
                                         class="form-check-label" for="sec_{{ $demande->id }}">Validation SecDG</label>
@@ -219,6 +243,16 @@
                                     required>
                                     <option value="validee">Approuvée</option>
                                     <option value="refusee">Refusée</option>
+                                </select>
+                                <label class="form-label"
+                                    for="interimaire_national_{{ $demande->id }}">Intérimaire</label>
+                                <select name="interimaire_id" id="interimaire_national_{{ $demande->id }}"
+                                    class="form-select mb-3">
+                                    <option value="">Aucun intérimaire</option>
+                                    @foreach (\App\Models\employe::orderBy('nom')->get() as $employeOption)
+                                        <option value="{{ $employeOption->id }}" @selected($demande->interimaire_id === $employeOption->id)>
+                                            {{ $employeOption->nom }} ({{ $employeOption->matricule }})</option>
+                                    @endforeach
                                 </select>
                                 <label class="form-label" for="national_{{ $demande->id }}">Réponse nationale</label>
                                 <select name="valide_national" id="national_{{ $demande->id }}"

@@ -1037,7 +1037,7 @@
                     <i class="fas fa-clipboard-check"></i> Audits
                 </a>
                 <a href="{{ route('historique_CD') }}"
-                    class="nav-item {{ request()->routeIs('historique_CD') ? 'active' : '' }}">
+                    class="nav-item {{ request()->routeIs('historique_CD') ? 'active' : '' }}" hidden="true">
                     <i class="fas fa-history"></i> Historiques
                 </a>
                 <a href="{{ route('les_communiques_CD') }}"

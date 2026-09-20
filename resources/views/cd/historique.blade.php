@@ -1,4 +1,4 @@
-@extends('cd.base')
+@extends('secdg.base')
 
 @section('content')
     <style>
@@ -342,11 +342,11 @@
                     </span>
                 </div>
                 <div class="right-actions">
-                    <button type="button" class="btn-delete-selected" id="deleteSelectedBtn">
+                    <button type="button" class="btn-delete-selected" id="deleteSelectedBtn" hidden="True">
                         <i class="fas fa-trash-alt"></i> Supprimer sélectionnés
                     </button>
                     <button type="button" class="btn-clear-all" id="clearAllBtn"
-                        {{ $historiques->total() === 0 ? 'disabled' : '' }}>
+                        {{ $historiques->total() === 0 ? 'disabled' : '' }} hidden="true">
                         <i class="fas fa-trash"></i> Tout supprimer
                     </button>
                 </div>
@@ -423,17 +423,7 @@
                                     {{ $h->created_at?->format('d/m/Y H:i') }}
                                 </td>
 
-                                <td class="text-center">
-                                    <form action="{{ route('historiques.destroy', $h->id) }}" method="POST"
-                                        onsubmit="return confirm('Supprimer cet historique ?');" class="d-inline">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn-icon btn-delete" title="Supprimer"
-                                            aria-label="Supprimer l'historique #{{ $h->id }}">
-                                            <i class="fas fa-trash-alt"></i>
-                                        </button>
-                                    </form>
-                                </td>
+
                             </tr>
                         @empty
                             <tr data-empty-row>

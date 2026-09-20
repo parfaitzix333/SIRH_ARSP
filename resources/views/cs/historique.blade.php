@@ -1,4 +1,4 @@
-@extends('cs.base')
+@extends('secdg.base')
 
 @section('content')
     <style>
@@ -322,14 +322,14 @@
             </div>
 
             {{-- Form de suppression en masse (isolé) --}}
-            <form id="deleteForm" action="{{ route('deleteSelected') }}" method="POST" class="d-none" hidden="True">
+            <form id="deleteForm" action="{{ route('deleteSelected') }}" method="POST" class="d-none">
                 @csrf
                 @method('DELETE')
                 <div id="deleteFormInputs"></div>
             </form>
 
             {{-- Actions du tableau --}}
-            <div class="table-actions" hidden="True">
+            <div class="table-actions">
                 <div class="left-actions">
                     <label class="d-flex align-items-center gap-2 mb-0" for="selectAllCheckbox">
                         <input type="checkbox" id="selectAllCheckbox" class="custom-checkbox"
@@ -342,11 +342,11 @@
                     </span>
                 </div>
                 <div class="right-actions">
-                    <button type="button" class="btn-delete-selected" id="deleteSelectedBtn">
+                    <button type="button" class="btn-delete-selected" id="deleteSelectedBtn" hidden="True">
                         <i class="fas fa-trash-alt"></i> Supprimer sélectionnés
                     </button>
                     <button type="button" class="btn-clear-all" id="clearAllBtn"
-                        {{ $historiques->total() === 0 ? 'disabled' : '' }}>
+                        {{ $historiques->total() === 0 ? 'disabled' : '' }} hidden="true">
                         <i class="fas fa-trash"></i> Tout supprimer
                     </button>
                 </div>
@@ -423,17 +423,7 @@
                                     {{ $h->created_at?->format('d/m/Y H:i') }}
                                 </td>
 
-                                <td class="text-center" hidden="True">
-                                    <form action="{{ route('historiques.destroy', $h->id) }}" method="POST"
-                                        onsubmit="return confirm('Supprimer cet historique ?');" class="d-inline">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn-icon btn-delete" title="Supprimer"
-                                            aria-label="Supprimer l'historique #{{ $h->id }}">
-                                            <i class="fas fa-trash-alt"></i>
-                                        </button>
-                                    </form>
-                                </td>
+
                             </tr>
                         @empty
                             <tr data-empty-row>

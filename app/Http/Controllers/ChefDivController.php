@@ -98,7 +98,16 @@ class ChefDivController extends Controller
 
     public function les_demandes_conge()
     {
-        return $this->vueAvecCollection('les_demandes_conge', 'les_demandes_conge', demandes_conge::class);
+        $user = Auth::user();
+        $annee = $this->anneeCourante();
+        $les_demandes_conge = $annee
+            ? demandes_conge::with(['employe', 'interimaire', 'conge', 'validePar', 'annee'])
+            ->where('annee_id', $annee->id)
+            ->latest()
+            ->get()
+            : collect();
+
+        return view('cd.les_demandes_conge', compact('user', 'les_demandes_conge'));
     }
 
     public function les_conges()
@@ -228,6 +237,30 @@ class ChefDivController extends Controller
         $les_utilisateurs = User::orderBy('name')->get();
 
         return view('cd.les_utilisateurs', compact('user', 'les_utilisateurs'));
+    }
+
+    public function fiche_de_demande_conge($id)
+    {
+        abort_unless(Auth::user()?->role === 'Chef-Division', 403);
+        $user = Auth::user();
+        $demande = demandes_conge::with(['employe', 'conge', 'validePar', 'annee', 'interimaire'])
+            ->where('valide_secDg', true)
+            ->findOrFail($id);
+        $annees = annee::orderBy('annee')->get(['id', 'annee']);
+        $joursParAnnee = demandes_conge::query()
+            ->where('employe_id', $demande->employe_id)
+            ->where('valide_secDg', true)
+            ->whereNotIn('statut', ['annulee', 'refusee'])
+            ->get(['annee_id', 'nombre_jour'])
+            ->groupBy('annee_id')
+            ->map(fn($demandes) => (int) $demandes->sum('nombre_jour'));
+        $exercices = $annees->map(fn($annee) => [
+            'annee' => $annee->annee,
+            'jours' => $joursParAnnee->get($annee->id, 0),
+        ]);
+        $cumulJours = $exercices->sum('jours');
+
+        return view('secdg.fiche_de_demande_conge', compact('user', 'demande', 'exercices', 'cumulJours'));
     }
 
     private function vueAvecCollection(string $vue, string $variable, string $model)

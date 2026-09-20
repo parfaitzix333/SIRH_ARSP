@@ -26,6 +26,7 @@
                             <tr>
                                 <th>#</th>
                                 <th>Employé</th>
+                                <th>Intérimaire</th>
                                 <th>Type</th>
                                 <th>Période</th>
                                 <th>Durée</th>
@@ -54,6 +55,7 @@
                                         <div class="fw-semibold">{{ $demande->employe?->nom ?? '—' }}</div>
                                         <small class="text-muted">{{ $demande->employe?->matricule ?? '—' }}</small>
                                     </td>
+                                    <td>{{ $demande->interimaire?->nom ?? '—' }}</td>
                                     <td>{{ $demande->conge?->designation ?? '—' }}</td>
                                     <td class="text-nowrap">
                                         {{ $demande->date_debut?->format('d/m/Y') }} au
@@ -110,7 +112,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="11" class="text-center text-muted py-5">
+                                    <td colspan="12" class="text-center text-muted py-5">
                                         <i class="fas fa-inbox fa-2x d-block mb-2"></i>
                                         Aucune demande de congé.
                                     </td>
@@ -131,6 +133,10 @@
                             <form action="{{ route('valider_conge', $demande->id) }}" method="POST">
                                 @csrf
                                 @method('PUT')
+                                <input type="hidden" name="employe_id" value="{{ $demande->employe_id }}">
+                                <input type="hidden" name="conge_id" value="{{ $demande->conge_id }}">
+                                <input type="hidden" name="nombre_jour" value="{{ $demande->nombre_jour }}">
+                                <input type="hidden" name="annee_id" value="{{ $demande->annee_id }}">
                                 <div class="modal-header">
                                     <h5 class="modal-title" id="editCongeModalLabel{{ $demande->id }}">Traiter la demande
                                     </h5>
@@ -138,6 +144,18 @@
                                         aria-label="Fermer"></button>
                                 </div>
                                 <div class="modal-body">
+                                    <div class="mb-3">
+                                        <label class="form-label"
+                                            for="interimaire_id_{{ $demande->id }}">Intérimaire</label>
+                                        <select class="form-select" id="interimaire_id_{{ $demande->id }}"
+                                            name="interimaire_id">
+                                            <option value="">Aucun intérimaire</option>
+                                            @foreach (\App\Models\employe::orderBy('nom')->get() as $employeOption)
+                                                <option value="{{ $employeOption->id }}" @selected($demande->interimaire_id === $employeOption->id)>
+                                                    {{ $employeOption->nom }} ({{ $employeOption->matricule }})</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
                                     <p class="mb-3">
                                         <strong>{{ $demande->employe?->nom }}</strong><br>
                                         <span class="text-muted">{{ $demande->conge?->designation }} ·
@@ -159,7 +177,8 @@
                                             for="valide_serv_no_{{ $demande->id }}">Rejeter</label>
                                     </div>
                                     <div class="mt-3">
-                                        <label for="commentaire_{{ $demande->id }}" class="form-label">Commentaire</label>
+                                        <label for="commentaire_{{ $demande->id }}"
+                                            class="form-label">Commentaire</label>
                                         <textarea name="commentaire_validation" id="commentaire_{{ $demande->id }}" class="form-control" rows="3"></textarea>
                                     </div>
                                 </div>

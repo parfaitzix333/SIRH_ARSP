@@ -6,6 +6,7 @@
         'columns' => [
             ['key' => 'matricule', 'label' => 'Matricule'],
             ['key' => 'nom', 'label' => 'Nom'],
+            ['key' => 'date_engagement', 'label' => 'Date d’engagement', 'type' => 'date'],
             ['key' => 'grade.designation', 'label' => 'Grade'],
             ['key' => 'service.nom_service', 'label' => 'Service'],
             ['key' => 'niveau_etude', 'label' => 'Niveau d’étude'],
@@ -17,6 +18,7 @@
             ['key' => 'grade_id', 'label' => 'Grade', 'type' => 'select', 'options' => 'grades'],
             ['key' => 'service_id', 'label' => 'Service', 'type' => 'select', 'options' => 'services'],
             ['key' => 'date_naissance', 'label' => 'Date de naissance', 'type' => 'date'],
+            ['key' => 'date_engagement', 'label' => 'Date d’engagement', 'type' => 'date'],
             ['key' => 'lieu_naissance', 'label' => 'Lieu de naissance'],
             ['key' => 'province_origine', 'label' => 'Province d’origine'],
             ['key' => 'territoire', 'label' => 'Territoire'],

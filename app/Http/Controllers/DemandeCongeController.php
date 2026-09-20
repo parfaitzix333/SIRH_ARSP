@@ -7,6 +7,7 @@ use App\Models\annee;
 use App\Models\conge;
 use App\Models\demandes_conge;
 use App\Models\employe;
+use App\Models\interime;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -17,7 +18,22 @@ class DemandeCongeController extends Controller
     use HandlesCrudHistory;
     private function rules(): array
     {
-        return ['employe_id' => ['required', 'exists:employes,id'], 'conge_id' => ['required', 'exists:conges,id'], 'date_debut' => ['required', 'date'], 'date_fin' => ['required', 'date', 'after_or_equal:date_debut'], 'nombre_jour' => ['required', 'integer', 'min:1'], 'motif' => ['nullable', 'string'], 'statut' => ['sometimes', 'in:brouillon,soumise,validee,refusee,annulee'], 'valide_par' => ['nullable', 'exists:users,id'], 'date_validation' => ['nullable', 'date'], 'commentaire_validation' => ['nullable', 'string'], 'annee_id' => ['required', 'exists:annees,id']];
+        return ['employe_id' => ['required', 'exists:employes,id'], 'interimaire_id' => ['nullable', 'exists:employes,id'], 'conge_id' => ['required', 'exists:conges,id'], 'date_debut' => ['required', 'date'], 'date_fin' => ['required', 'date', 'after_or_equal:date_debut'], 'nombre_jour' => ['required', 'integer', 'min:1'], 'motif' => ['nullable', 'string'], 'statut' => ['sometimes', 'in:brouillon,soumise,validee,refusee,annulee'], 'valide_par' => ['nullable', 'exists:users,id'], 'date_validation' => ['nullable', 'date'], 'commentaire_validation' => ['nullable', 'string'], 'annee_id' => ['required', 'exists:annees,id']];
+    }
+
+    private function synchroniserInterime(demandes_conge $demande): void
+    {
+        interime::updateOrCreate(
+            [
+                'employe_id' => $demande->employe_id,
+                'annee_id' => $demande->annee_id,
+            ],
+            [
+                'interimaire_id' => $demande->interimaire_id,
+                'date_debut' => null,
+                'date_fin' => null,
+            ],
+        );
     }
     public function store(Request $request)
     {
@@ -123,6 +139,10 @@ class DemandeCongeController extends Controller
 
         $data = $request->validate($this->rules());
         $item->update($data);
+        if (($data['statut'] ?? $item->statut) === 'validee'
+            && array_key_exists('interimaire_id', $data)) {
+            $this->synchroniserInterime($item);
+        }
         $this->historique('Mise à jour de la demande de congé #' . $item->id, $item->annee_id);
         return back()->with('success', 'Demande de congé mise à jour avec succès.');
     }
@@ -154,6 +174,9 @@ class DemandeCongeController extends Controller
         }
         try {
             $conge->update($data);
+            if (($data['statut'] ?? null) === 'validee') {
+                $this->synchroniserInterime($conge);
+            }
             return back()->with('success', 'Congé validé avec succès.');
         } catch (\Exception $e) {
             return back()->withErrors('Erreur lors de la validation : ' . $e->getMessage());
@@ -186,6 +209,10 @@ class DemandeCongeController extends Controller
             'commentaire_validation' => $data['commentaire_validation'] ?? $demande->commentaire_validation,
         ]);
 
+        if ($demande->statut === 'validee') {
+            $this->synchroniserInterime($demande);
+        }
+
         $this->historique(
             ($demande->valide_serv ? 'Validation' : 'Rejet') . ' de la demande de congé #' . $demande->id . ' par le Chef Service',
             $demande->annee_id,
@@ -208,13 +235,23 @@ class DemandeCongeController extends Controller
 
         $data = $request->validate([
             'valide_secDg' => ['required', 'boolean'],
+            'interimaire_id' => ['nullable', 'exists:employes,id'],
+            'statut' => ['nullable', 'in:validee,refusee'],
             'commentaire_validation' => ['nullable', 'string', 'max:5000'],
         ]);
 
         $demande->update([
             'valide_secDg' => (bool) $data['valide_secDg'],
+            'interimaire_id' => array_key_exists('interimaire_id', $data)
+                ? $data['interimaire_id']
+                : $demande->interimaire_id,
+            'statut' => $data['statut'] ?? $demande->statut,
             'commentaire_validation' => $data['commentaire_validation'] ?? $demande->commentaire_validation,
         ]);
+
+        if ($demande->statut === 'validee') {
+            $this->synchroniserInterime($demande);
+        }
 
         $this->historique(
             ($demande->valide_secDg ? 'Validation' : 'Rejet') . ' niveau SecDG de la demande #' . $demande->id,
@@ -237,16 +274,22 @@ class DemandeCongeController extends Controller
         $data = $request->validate([
             'valide_national' => ['required', 'boolean'],
             'statut' => ['nullable', 'in:validee,refusee'],
+            'interimaire_id' => ['nullable', 'exists:employes,id'],
             'commentaire_validation' => ['nullable', 'string', 'max:5000'],
         ]);
 
         $demande->update([
             'valide_national' => $data['statut'] === 'validee' && (bool) $data['valide_national'],
             'statut' => $data['statut'],
+            'interimaire_id' => $data['interimaire_id'] ?? $demande->interimaire_id,
             'date_validation' => now(),
             'valide_par' => Auth::id(),
             'commentaire_validation' => $data['commentaire_validation'] ?? $demande->commentaire_validation,
         ]);
+
+        if ($demande->statut === 'validee') {
+            $this->synchroniserInterime($demande);
+        }
 
         $this->historique('Validation nationale de la demande #' . $demande->id, $demande->annee_id);
 
