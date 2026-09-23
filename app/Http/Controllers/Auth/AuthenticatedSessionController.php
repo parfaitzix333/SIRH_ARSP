@@ -32,7 +32,7 @@ class AuthenticatedSessionController extends Controller
         $user = Auth::user();
         $employe = employe::where('user_id', $user->id)->first();
 
-        if ($user->id === 1 || $user->role === 'DG') {
+        if ($user->id === 1 || $user->role === 'DP') {
             return redirect()->route('accueil_dg');
         }
         if ($user->role === 'Suspendu') {

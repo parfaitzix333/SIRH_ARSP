@@ -27,6 +27,8 @@ use App\Models\reglement;
 use App\Models\sanction;
 use App\Models\service;
 use App\Models\User;
+use Carbon\Carbon;
+use Carbon\CarbonPeriod;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -269,5 +271,67 @@ class ChefDivController extends Controller
         ${$variable} = $this->parAnnee($model);
 
         return view('cd.' . $vue, compact('user', $variable));
+    }
+
+    public function profile_cd()
+    {
+        $user = Auth::user();
+        return view('cd.profile_cd', compact('user'));
+    }
+
+    public function etat_general_employes($id_emp)
+    {
+        $user = Auth::user();
+        $annee = $this->anneeCourante() ?? annee::where('statut', 'active')->first();
+        $anneeNumero = $annee?->annee ?? now()->year;
+        $employe = employe::with([
+            'grade',
+            'service',
+            'annee',
+            'affectations' => fn($query) => $query->with(['service', 'categorie', 'poste', 'annee'])
+                ->orderByDesc('date_debut'),
+            'audits' => fn($query) => $query->where('annee_id', $annee?->id)->latest('date_debut_service'),
+            'demandesConges' => fn($query) => $query->with('conge', 'annee')->latest('date_debut'),
+            'disciplines' => fn($query) => $query->with('sanction', 'annee')->latest('DATE'),
+            'mouvements' => fn($query) => $query->with('annee')->latest(),
+            'dossiersEtude' => fn($query) => $query->with('annee')->latest(),
+        ])->findOrFail($id_emp);
+
+        $debutAnnee = Carbon::create($anneeNumero, 1, 1)->startOfDay();
+        $finAnnee = Carbon::create($anneeNumero, 12, 31)->endOfDay();
+        $dateLimite = $anneeNumero === now()->year ? now()->endOfDay() : $finAnnee;
+        $presences = $employe->presences()
+            ->whereBetween('DATE', [$debutAnnee, $dateLimite])
+            ->get(['DATE']);
+        $presenceDates = $presences->map(fn($presence) => Carbon::parse($presence->DATE)->toDateString())->unique();
+        $presencesMensuelles = collect(range(1, 12))->map(function ($mois) use ($anneeNumero, $dateLimite, $presenceDates) {
+            $debut = Carbon::create($anneeNumero, $mois, 1)->startOfDay();
+            $fin = $debut->copy()->endOfMonth()->min($dateLimite);
+            if ($debut->greaterThan($dateLimite)) {
+                return ['mois' => $mois, 'presences' => 0, 'absences' => 0];
+            }
+
+            $joursOuvres = collect(CarbonPeriod::create($debut, $fin))
+                ->filter(fn($jour) => Carbon::parse((string) $jour)->isWeekday())
+                ->count();
+            $presencesMois = $presenceDates->filter(fn($date) => Carbon::parse($date)->month === $mois)->count();
+
+            return [
+                'mois' => $mois,
+                'presences' => $presencesMois,
+                'absences' => max(0, $joursOuvres - $presencesMois),
+            ];
+        });
+
+        return view('cd.etat_general_employe', [
+            'user' => $user,
+            'employe' => $employe,
+            'annee' => $annee,
+            'audit' => $employe->audits->first(),
+            'affectation' => $employe->affectations->first(),
+            'presencesMensuelles' => $presencesMensuelles,
+            'presencesAnnuelles' => $presenceDates->count(),
+            'absencesAnnuelles' => $presencesMensuelles->sum('absences'),
+        ]);
     }
 }

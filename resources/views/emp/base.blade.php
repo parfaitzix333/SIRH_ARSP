@@ -873,7 +873,7 @@
 
         {{-- Droite : Profil + Toggle --}}
         <div class="header-right">
-            <a href="{{ route('profile.edit') }}" class="user-info text-decoration-none" aria-label="Mon profil">
+            <a href="{{ route('profile_emp') }}" class="user-info text-decoration-none" aria-label="Mon profil">
                 <span class="user-avatar">
                     <i class="fas fa-user"></i>
                 </span>

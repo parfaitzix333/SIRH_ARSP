@@ -19,7 +19,7 @@ class CommuniqueController extends Controller
     {
         return [
             'tous',
-            'DG',
+            'DP',
             'SecDG',
             'Chef-Division',
             'Chef-Service',

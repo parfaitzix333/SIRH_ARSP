@@ -1,7 +1,16 @@
-@extends('dg.base')
+@extends($layout ?? 'dg.base')
 
 @section('content')
     @php
+        $routes = $routes ?? [
+            'utilisateurs' => 'les_utilisateurs',
+            'employes' => 'les_employes',
+            'affectations' => 'les_affectations',
+            'demandes_conge' => 'les_demandes_conge',
+            'services' => 'les_services',
+            'annees' => 'les_annees',
+        ];
+
         // ============================================================
         // Préparation des données en haut de la vue (plus lisible)
         // ============================================================
@@ -13,7 +22,7 @@
                 'value' => $les_utilisateurs,
                 'color' => '#2274a5',
                 'icon' => 'fa-users',
-                'route' => 'les_utilisateurs',
+                'route' => $routes['utilisateurs'],
                 'cta' => 'Voir les utilisateurs',
             ],
             [
@@ -21,7 +30,7 @@
                 'value' => $les_employes,
                 'color' => '#6b46c1',
                 'icon' => 'fa-id-card',
-                'route' => 'les_employes',
+                'route' => $routes['employes'],
                 'cta' => 'Voir les employés',
             ],
             [
@@ -29,7 +38,7 @@
                 'value' => $les_affectations,
                 'color' => '#2f855a',
                 'icon' => 'fa-user-check',
-                'route' => 'les_affectations',
+                'route' => $routes['affectations'],
                 'cta' => 'Voir les affectations',
             ],
             [
@@ -37,7 +46,7 @@
                 'value' => $les_demandes_conges_annee,
                 'color' => '#b7791f',
                 'icon' => 'fa-calendar-alt',
-                'route' => 'les_demandes_conge',
+                'route' => $routes['demandes_conge'],
                 'cta' => 'Gérer les demandes',
             ],
         ];
@@ -228,7 +237,7 @@ $presencesParMois = $presencesMensuelles->pluck('presences')->pad(12, 0)->values
     <div class="container-fluid py-4">
         {{-- En-tête --}}
         <div class="dashboard-heading">
-            <h2>Tableau de bord DG</h2>
+            <h2>Tableau de bord {{ $title ?? 'DP' }}</h2>
             <p>Vue d’ensemble de l’activité pour l’année {{ $annee }}.</p>
         </div>
 
@@ -284,7 +293,7 @@ $presencesParMois = $presencesMensuelles->pluck('presences')->pad(12, 0)->values
                     <h5 class="mb-1">Demandes non validées</h5>
                     <span class="text-muted small">Demandes de congé de l’année {{ $annee }}</span>
                 </div>
-                <a class="btn btn-sm btn-outline-primary" href="{{ route('les_demandes_conge') }}">
+                <a class="btn btn-sm btn-outline-primary" href="{{ route($routes['demandes_conge']) }}">
                     Voir tout <i class="fas fa-arrow-right ms-1"></i>
                 </a>
             </div>
@@ -350,17 +359,17 @@ $presencesParMois = $presencesMensuelles->pluck('presences')->pad(12, 0)->values
             </div>
             <div class="row g-3">
                 <div class="col-12 col-md-4">
-                    <a href="{{ route('les_employes') }}">
+                    <a href="{{ route($routes['employes']) }}">
                         <i class="fas fa-id-card"></i><span>Consulter les employés</span>
                     </a>
                 </div>
                 <div class="col-12 col-md-4">
-                    <a href="{{ route('les_services') }}">
+                    <a href="{{ route($routes['services']) }}">
                         <i class="fas fa-building"></i><span>Consulter les services</span>
                     </a>
                 </div>
                 <div class="col-12 col-md-4">
-                    <a href="{{ route('les_annees') }}">
+                    <a href="{{ route($routes['annees']) }}">
                         <i class="fas fa-calendar-days"></i><span>Gérer les années</span>
                     </a>
                 </div>

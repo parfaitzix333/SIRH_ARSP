@@ -313,7 +313,7 @@ class DgController extends Controller
 
     public function fiche_de_demande_conge($id)
     {
-        abort_unless(Auth::user()?->role === 'DG', 403);
+        abort_unless(Auth::user()?->role === 'DP', 403);
         $user = Auth::user();
         $demande = demandes_conge::with(['employe', 'interimaire', 'conge', 'validePar', 'annee'])
             ->where('valide_secDg', true)
@@ -333,5 +333,11 @@ class DgController extends Controller
         $cumulJours = $exercices->sum('jours');
 
         return view('secdg.fiche_de_demande_conge', compact('user', 'demande', 'exercices', 'cumulJours'));
+    }
+
+    public function profile_dp()
+    {
+        $user = Auth::user();
+        return view('dg.profile_dp', compact('user'));
     }
 }

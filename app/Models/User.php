@@ -27,12 +27,18 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'autorisation' => 'boolean',
         ];
     }
 
     public function employes()
     {
         return $this->hasMany(employe::class);
+    }
+
+    public function employe()
+    {
+        return $this->hasOne(employe::class);
     }
 
     public function annee()

@@ -1,7 +1,7 @@
 @php
     $rolesCibles = [
         ['value' => 'tous', 'label' => 'tous'],
-        ['value' => 'DG', 'label' => 'DG'],
+        ['value' => 'DP', 'label' => 'DP'],
         ['value' => 'SecDG', 'label' => 'SecDG'],
         ['value' => 'Chef-Division', 'label' => 'Chef-Division'],
         ['value' => 'Chef-Service', 'label' => 'Chef-Service'],

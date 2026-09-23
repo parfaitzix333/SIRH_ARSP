@@ -5,6 +5,7 @@ use App\Http\Controllers\AffectationController;
 use App\Http\Controllers\ArchiveController;
 use App\Http\Controllers\AuditController;
 use App\Http\Controllers\CategorieController;
+use App\Http\Controllers\ChefBureauController;
 use App\Http\Controllers\ChefDivController;
 use App\Http\Controllers\ChefServController;
 use App\Http\Controllers\CommuniqueController;
@@ -51,7 +52,7 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    //les profiles
+    //les pages d'accueil
     Route::get('/accueil_dg', [ProfileController::class, 'accueil_dg'])->name('accueil_dg');
     Route::get('/accueil_secDg', [ProfileController::class, 'accueil_secDg'])->name('accueil_secDg');
     Route::get('/accueil_cs', [ProfileController::class, 'accueil_cs'])->name('accueil_cs');
@@ -60,6 +61,17 @@ Route::middleware('auth')->group(function () {
     Route::get('/accueil_cb1', [ProfileController::class, 'accueil_cb1'])->name('accueil_cb1');
     Route::get('/accueil_cb2', [ProfileController::class, 'accueil_cb2'])->name('accueil_cb2');
     Route::get('/accueil_cb3', [ProfileController::class, 'accueil_cb3'])->name('accueil_cb3');
+    //----------------les profiles
+    Route::get('/profile_dp', [DgController::class, 'profile_dp'])->name('profile_dp');
+    Route::get('/profile_secDg', [SecDgController::class, 'profile_secDg'])->name('profile_secDg');
+    Route::get('/profile_cs', [ChefServController::class, 'profile_cs'])->name('profile_cs');
+    Route::get('/profile_employe', [EmployeController::class, 'profile_employe'])->name('profile_employe');
+    Route::get('/profile_cd', [ChefDivController::class, 'profile_cd'])->name('profile_cd');
+    Route::get('/profile_cb1', [ChefBureauController::class, 'profile_cb1'])->name('profile_cb1');
+    Route::get('/profile_cb2', [ChefBureauController::class, 'profile_cb2'])->name('profile_cb2');
+    Route::get('/profile_cb3', [ChefBureauController::class, 'profile_cb3'])->name('profile_cb3');
+    Route::get('/profile_emp', [EmployeController::class, 'profile_emp'])->name('profile_emp');
+    Route::put('/editpass/{id}', [UtilisateurController::class, 'editpass'])->name('editpass');
 
     //=====================================================================
 
@@ -145,6 +157,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/les_utilisateurs_CD', [ChefDivController::class, 'les_utilisateurs'])->name('les_utilisateurs_CD');
     Route::get('/fiche_de_demande_conge_cd/{id}', [ChefDivController::class, 'fiche_de_demande_conge'])->name('fiche_de_demande_conge_cd');
     Route::get('/les_grades_CD', [ChefDivController::class, 'les_grades'])->name('les_grades_CD');
+    Route::get('/etat_general_employes_CD/{id_emp}', [ChefDivController::class, 'etat_general_employes'])->name('etat_general_employes_CD');
     //========================================================
 
 

@@ -254,4 +254,10 @@ class ChefServController extends Controller
 
         return view('cs.' . $vue, compact('user', $variable));
     }
+
+    public function profile_cs()
+    {
+        $user = Auth::user();
+        return view('cs.profile_cs', compact('user'));
+    }
 }

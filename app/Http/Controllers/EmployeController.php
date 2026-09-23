@@ -119,4 +119,10 @@ class EmployeController extends Controller
         $mon_service = service::find($employe->service_id);
         return view('emp.mon_autorisation', compact('employe', 'mon_conge', 'mon_service'));
     }
+
+    public function profile_emp()
+    {
+        $user = Auth::user();
+        return view('emp.profile_emp', compact('user'));
+    }
 }

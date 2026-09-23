@@ -12,6 +12,7 @@ use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 
@@ -82,10 +83,13 @@ class ProfileController extends Controller
             ->get(['statut'])
             ->groupBy(fn($demande) => $demande->statut ?: 'non_renseigne')
             ->map->count();
+        $moisExpression = DB::connection()->getDriverName() === 'sqlite'
+            ? "strftime('%m', DATE)"
+            : 'MONTH(`DATE`)';
         $presencesParMois = presence::query()
             ->whereYear('DATE', $annee)
-            ->selectRaw('MONTH(`DATE`) as mois, COUNT(DISTINCT employe_id) as total')
-            ->groupByRaw('MONTH(`DATE`)')
+            ->selectRaw("{$moisExpression} as mois, COUNT(DISTINCT employe_id) as total")
+            ->groupByRaw($moisExpression)
             ->pluck('total', 'mois');
         $presencesMensuelles = collect(range(1, 12))->map(fn($mois) => [
             'mois' => $mois,
@@ -116,7 +120,7 @@ class ProfileController extends Controller
 
 
     //les profiles
-    public function accueil_dg()
+    private function dashboardViewData(string $layout, array $routes, string $title): array
     {
         $nb = $this->var_dashboard();
         $user = Auth::user();
@@ -131,7 +135,7 @@ class ProfileController extends Controller
         $presencesMensuelles = $nb['presences_mensuelles'] ?? collect();
         $annee = $nb['annee'] ?? now()->year;
 
-        return view('profile.accueil_dg', compact(
+        return compact(
             'user',
             'les_utilisateurs',
             'les_employes',
@@ -142,14 +146,40 @@ class ProfileController extends Controller
             'annee',
             'demandesNonValidees',
             'demandesParStatut',
-            'presencesMensuelles'
-        ));
+            'presencesMensuelles',
+            'layout',
+            'routes',
+            'title'
+        );
+    }
+
+    //les profiles
+    public function accueil_dg()
+    {
+        return view('profile.accueil_dg', $this->dashboardViewData('dg.base', [
+            'utilisateurs' => 'les_utilisateurs',
+            'employes' => 'les_employes',
+            'affectations' => 'les_affectations',
+            'demandes_conge' => 'les_demandes_conge',
+            'services' => 'les_services',
+            'annees' => 'les_annees',
+        ], 'DP'));
     }
 
     public function accueil_secDg()
     {
         $user = Auth::user();
-        return view('profile.accueil_secGeneral', compact('user'));
+
+        abort_unless($user?->autorisation === true, 403);
+
+        return view('profile.accueil_secGeneral', $this->dashboardViewData('secdg.base', [
+            'utilisateurs' => 'les_utilisateurs_SG',
+            'employes' => 'les_employes_SG',
+            'affectations' => 'les_affectations_SG',
+            'demandes_conge' => 'les_demandes_conge_SG',
+            'services' => 'les_services_SG',
+            'annees' => 'les_annees_SG',
+        ], 'Secrétaire général'));
     }
 
     public function accueil_cs()
@@ -160,8 +190,14 @@ class ProfileController extends Controller
 
     public function accueil_cd()
     {
-        $user = Auth::user();
-        return view('profile.accueil_chef_div', compact('user'));
+        return view('profile.accueil_chef_div', $this->dashboardViewData('cd.base', [
+            'utilisateurs' => 'les_utilisateurs_CD',
+            'employes' => 'les_employes_CD',
+            'affectations' => 'les_affectations_CD',
+            'demandes_conge' => 'les_demandes_conge_CD',
+            'services' => 'les_services_CD',
+            'annees' => 'les_annees_CD',
+        ], 'Chef Division'));
     }
     public function accueil_cb1()
     {
@@ -180,7 +216,8 @@ class ProfileController extends Controller
     }
     public function accueil_employe()
     {
-        $user = Auth::user();
+        $user = User::with(['employe.service', 'employe.grade', 'employe.disciplines'])
+            ->findOrFail(Auth::id());
         return view('profile.accueil_employe', compact('user'));
     }
 }

@@ -19,7 +19,7 @@ class UtilisateurController extends Controller
 {
     private const ROLES = [
         'user',
-        'DG',
+        'DP',
         'SecDG',
         'Chef-Division',
         'Chef-Service',
@@ -70,7 +70,7 @@ class UtilisateurController extends Controller
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
             'matricule' => 'nullable|string|max:255',
-            'role' => ['required', 'string', 'in:' . implode(',', self::ROLES)],
+            'role' => ['nullable', 'string', 'in:' . implode(',', self::ROLES)],
             'autorisation' => ['nullable', 'boolean'],
         ]);
 
@@ -89,7 +89,7 @@ class UtilisateurController extends Controller
         $data = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $utilisateur->id,
-            'role' => ['required', 'string', 'in:' . implode(',', self::ROLES)],
+            'role' => ['nullable', 'string', 'in:' . implode(',', self::ROLES)],
             'password' => 'nullable|string|min:8',
             'matricule' => 'nullable|string|max:255',
             'autorisation' => ['nullable', 'boolean'],

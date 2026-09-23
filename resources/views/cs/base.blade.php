@@ -885,7 +885,7 @@
                 <br>
                 <span class="role-badge">{{ Auth::user()->role ?? '—' }}</span>
             </span>
-            <a href="{{ route('profile.edit') }}" class="btn btn-outline-light btn-sm">
+            <a href="{{ route('profile_cs') }}" class="btn btn-outline-light btn-sm">
                 <i class="fa fa-edit"></i>
                 <small class="label_profil">Mon
                     Profil</small></a>
