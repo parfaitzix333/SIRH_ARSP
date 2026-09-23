@@ -140,7 +140,8 @@ class DemandeCongeController extends Controller
         $data = $request->validate($this->rules());
         $item->update($data);
         if (($data['statut'] ?? $item->statut) === 'validee'
-            && array_key_exists('interimaire_id', $data)) {
+            && array_key_exists('interimaire_id', $data)
+        ) {
             $this->synchroniserInterime($item);
         }
         $this->historique('Mise à jour de la demande de congé #' . $item->id, $item->annee_id);
@@ -189,7 +190,7 @@ class DemandeCongeController extends Controller
     {
         abort_unless(Auth::user()?->role === 'Chef-Service', 403);
 
-        $demande = demandes_conge::findOrFail($id);
+        $demande = demandes_conge::with('employe')->findOrFail($id);
 
         if ($demande->valide_secDg) {
             return back()->withErrors('Cette demande a déjà été traitée par le SecDG et ne peut plus être modifiée.');

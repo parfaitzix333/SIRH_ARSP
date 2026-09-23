@@ -41,14 +41,19 @@
                                 <td>{{ $loop->iteration }}</td>
                                 <td>
                                     <div class="fw-semibold">{{ $demande->employe?->nom ?? '—' }}</div>
-                                    <small class="text-muted">{{ $demande->employe?->matricule ?? '—' }}</small>
                                 </td>
                                 <td>{{ $demande->interimaire?->nom ?? '—' }}</td>
                                 <td>{{ $demande->conge?->designation ?? '—' }}</td>
                                 <td class="text-nowrap">{{ $demande->date_debut?->format('d/m/Y') }} au
                                     {{ $demande->date_fin?->format('d/m/Y') }}</td>
                                 <td>{{ $demande->nombre_jour }} jour(s)</td>
-                                <td><span class="badge text-bg-success">Validée</span></td>
+                                <td>
+                                    @if ($demande->valide_serv == 1)
+                                        <span class="badge text-bg-success">Validée</span>
+                                    @else
+                                        <span class="badge text-bg-secondary">En attente</span>
+                                    @endif
+                                </td>
                                 <td>
                                     <span
                                         class="badge text-bg-{{ $demande->statut === 'validee' ? 'success' : ($demande->statut === 'refusee' ? 'danger' : 'warning text-dark') }}">
@@ -56,7 +61,7 @@
                                     </span>
                                 </td>
                                 <td>
-                                    @if ($demande->valide_secDg)
+                                    @if ($demande->valide_secDg == 1)
                                         <span class="badge text-bg-success">Validée</span>
                                     @else
                                         <span class="badge text-bg-secondary">En attente</span>
@@ -75,7 +80,7 @@
                                             <i class="fas fa-landmark"></i>
                                         </button>
                                     @endif
-                                    @if ($demande->valide_secDg)
+                                    @if ($demande->valide_secDg == 1)
                                         <a href="{{ route('fiche_de_demande_conge_dg', $demande->id) }}"
                                             class="btn btn-outline-primary btn-sm" title="Ouvrir la fiche">
                                             <i class="fas fa-file-lines"></i>
@@ -118,16 +123,6 @@
                         @csrf
                         @method('PUT')
                         <input type="hidden" name="employe_id" value="{{ $demande->employe_id }}">
-                        <div class="mb-3">
-                            <label class="form-label" for="interimaire_id_{{ $demande->id }}">Intérimaire</label>
-                            <select class="form-select" id="interimaire_id_{{ $demande->id }}" name="interimaire_id">
-                                <option value="">Aucun intérimaire</option>
-                                @foreach (\App\Models\employe::orderBy('nom')->get() as $employeOption)
-                                    <option value="{{ $employeOption->id }}" @selected($demande->interimaire_id === $employeOption->id)>
-                                        {{ $employeOption->nom }} ({{ $employeOption->matricule }})</option>
-                                @endforeach
-                            </select>
-                        </div>
                         <input type="hidden" name="conge_id" value="{{ $demande->conge_id }}">
                         <input type="hidden" name="nombre_jour" value="{{ $demande->nombre_jour }}">
                         <input type="hidden" name="annee_id" value="{{ $demande->annee_id }}">
@@ -137,6 +132,27 @@
                         </div>
                         <div class="modal-body">
                             <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label" for="interimaire_id_{{ $demande->id }}">Intérimaire</label>
+                                    <select class="form-select" id="interimaire_id_{{ $demande->id }}"
+                                        name="interimaire_id">
+                                        <option value="">Aucun intérimaire</option>
+                                        @foreach (\App\Models\employe::orderBy('nom')->get() as $employeOption)
+                                            <option value="{{ $employeOption->id }}" @selected($demande->interimaire_id === $employeOption->id)>
+                                                {{ $employeOption->nom }} ({{ $employeOption->matricule }})</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label" for="statut_{{ $demande->id }}">Statut</label>
+                                    <select class="form-select" id="statut_{{ $demande->id }}" name="statut">
+                                        <option value="brouillon" @selected($demande->statut === 'brouillon')>Brouillon</option>
+                                        <option value="soumise" @selected($demande->statut === 'soumise')>Soumise</option>
+                                        <option value="validee" @selected($demande->statut === 'validee')>Validée</option>
+                                        <option value="refusee" @selected($demande->statut === 'refusee')>Refusée</option>
+                                        <option value="annulee" @selected($demande->statut === 'annulee')>Annulée</option>
+                                    </select>
+                                </div>
                                 <div class="col-md-6">
                                     <label class="form-label" for="date_debut_{{ $demande->id }}">Date de début</label>
                                     <input type="date" class="form-control" id="date_debut_{{ $demande->id }}"
@@ -150,16 +166,6 @@
                                 <div class="col-12">
                                     <label class="form-label" for="motif_{{ $demande->id }}">Motif</label>
                                     <textarea class="form-control" id="motif_{{ $demande->id }}" name="motif" rows="3">{{ $demande->motif }}</textarea>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label" for="statut_{{ $demande->id }}">Statut</label>
-                                    <select class="form-select" id="statut_{{ $demande->id }}" name="statut">
-                                        <option value="brouillon" @selected($demande->statut === 'brouillon')>Brouillon</option>
-                                        <option value="soumise" @selected($demande->statut === 'soumise')>Soumise</option>
-                                        <option value="validee" @selected($demande->statut === 'validee')>Validée</option>
-                                        <option value="refusee" @selected($demande->statut === 'refusee')>Refusée</option>
-                                        <option value="annulee" @selected($demande->statut === 'annulee')>Annulée</option>
-                                    </select>
                                 </div>
                             </div>
                         </div>

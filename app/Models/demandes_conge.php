@@ -29,6 +29,9 @@ class demandes_conge extends Model
         'date_debut' => 'date',
         'date_fin' => 'date',
         'date_validation' => 'datetime',
+        'valide_national' => 'boolean',
+        'valide_secDg' => 'boolean',
+        'valide_serv' => 'boolean',
     ];
 
     public function employe()

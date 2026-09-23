@@ -100,8 +100,9 @@ class ChefServController extends Controller
     {
         $user = Auth::user();
         $annee = $this->anneeCourante();
+
         $les_demandes_conge = $annee
-            ? demandes_conge::with(['employe', 'interimaire', 'conge', 'validePar', 'annee'])
+            ? demandes_conge::with(['employe', 'interimaire', 'conge', 'annee'])
             ->where('annee_id', $annee->id)
             ->latest()
             ->get()

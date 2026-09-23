@@ -168,6 +168,7 @@
                                 <th>Durée</th>
                                 <th>Motif</th>
                                 <th>Statut</th>
+                                <th>Chef Service</th>
                                 <th>Validation</th>
                             </tr>
                         </thead>
@@ -197,6 +198,13 @@
                                         <span class="badge text-bg-{{ $statut['class'] }}">{{ $statut['label'] }}</span>
                                     </td>
                                     <td>
+                                        @if ($conge->valide_serv === true)
+                                            <span class="badge text-bg-success">Validée</span>
+                                        @else
+                                            <span class="badge text-bg-secondary">En attente</span>
+                                        @endif
+                                    </td>
+                                    <td>
                                         @if ($conge->date_validation)
                                             <div class="small">{{ $conge->date_validation->format('d/m/Y H:i') }}</div>
                                             <div class="small text-muted">
@@ -208,7 +216,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="6" class="text-center text-muted py-5">
+                                    <td colspan="8" class="text-center text-muted py-5">
                                         <i class="fas fa-calendar-xmark fa-2x d-block mb-2"></i>
                                         Aucune demande de congé enregistrée.
                                     </td>
