@@ -935,7 +935,7 @@
                     <i class="fas fa-chart-line"></i> Performances
                 </a>
                 <a href="{{ route('les_dossiers_etude_CS') }}"
-                    class="nav-item {{ request()->routeIs('les_dossiers_etude_CS') ? 'active' : '' }}">
+                    class="nav-item {{ request()->routeIs('les_dossiers_etude_CS') ? 'active' : '' }}" hidden="True">
                     <i class="fas fa-folder-open"></i> Dossiers d'étude
                 </a>
                 <a href="{{ route('les_archives_CS') }}"
@@ -962,10 +962,6 @@
                 <a href="{{ route('les_demandes_conge_CS') }}"
                     class="nav-item {{ request()->routeIs('les_demandes_conge_CS') ? 'active' : '' }}">
                     <i class="fas fa-file-signature"></i> Demandes de congé
-                </a>
-                <a href="{{ route('les_conges_CS') }}"
-                    class="nav-item {{ request()->routeIs('les_conges_CS') ? 'active' : '' }}" hidden="True">
-                    <i class="fas fa-umbrella-beach"></i> Types de congé
                 </a>
                 <a href="{{ route('les_disciplines_CS') }}"
                     class="nav-item {{ request()->routeIs('les_disciplines_CS') ? 'active' : '' }}">
@@ -1040,7 +1036,7 @@
                     <i class="fas fa-clipboard-check"></i> Audits
                 </a>
                 <a href="{{ route('historique_CS') }}"
-                    class="nav-item {{ request()->routeIs('historique_CS') ? 'active' : '' }}">
+                    class="nav-item {{ request()->routeIs('historique_CS') ? 'active' : '' }}" hidden="true">
                     <i class="fas fa-history"></i> Historiques
                 </a>
                 <a href="{{ route('les_communiques_CS') }}"

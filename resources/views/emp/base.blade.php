@@ -807,6 +807,14 @@
                 padding: 0 !important;
             }
         }
+
+        #b1_link {
+            background-color: peru;
+        }
+
+        #b1_link i {
+            color: rgb(247, 250, 247);
+        }
     </style>
 
     @stack('styles')
@@ -901,6 +909,46 @@
                 <i class="fas fa-home"></i>
                 <span>Accueil</span>
             </a>
+
+
+
+
+            @if ($user->role === 'Chef-Bureau1')
+                <a href="{{ route('les_presences_jour_cb') }}"
+                    class="nav-link {{ Route::is('les_presences_jour_cb') ? 'active' : '' }}" id="b1_link">
+                    <i class="fas fa-calendar-day"></i>
+                    <span>Les Presences/Jours</span>
+                </a>
+                <a href="{{ route('les_presences_mois_cb') }}"
+                    class="nav-link {{ Route::is('les_presences_mois_cb') ? 'active' : '' }}" id="b1_link">
+                    <i class="fas fa-calendar-days"></i>
+                    <span>Les Presences/Mois</span>
+                </a>
+                <a href="{{ route('les_employes_cb') }}"
+                    class="nav-link {{ Route::is('les_employes_cb') ? 'active' : '' }}" id="b1_link">
+                    <i class="fas fa-calendar-check"></i>
+                    <span>Les Employés</span>
+                </a>
+            @elseif ($user->role === 'Chef-Bureau2')
+                <a href="{{ route('les_mouvements_jour_cb') }}"
+                    class="nav-link {{ Route::is('les_mouvements_jour_cb') ? 'active' : '' }}" id="b1_link">
+                    <i class="fas fa-calendar-check"></i>
+                    <span>Les Mouvements/Jour</span>
+                </a>
+                <a href="{{ route('les_mouvements_mois_cb') }}"
+                    class="nav-link {{ Route::is('les_mouvements_mois_cb') ? 'active' : '' }}" id="b1_link">
+                    <i class="fas fa-calendar-check"></i>
+                    <span>Les Mouvements/Mois</span>
+                </a>
+
+                <a href="{{ route('les_employes_cb') }}"
+                    class="nav-link {{ Route::is('les_employes_cb') ? 'active' : '' }}" id="b1_link">
+                    <i class="fas fa-calendar-check"></i>
+                    <span>Les Employés</span>
+                </a>
+            @else
+            @endif
+
             <a href="{{ route('mes_conges') }}" class="nav-link {{ Route::is('mes_conges') ? 'active' : '' }}">
                 <i class="fas fa-calendar-check"></i>
                 <span>Congés</span>

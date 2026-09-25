@@ -47,19 +47,17 @@ class AuthenticatedSessionController extends Controller
         }
         if ($user->role === 'Chef-Service') {
             return redirect()->route('accueil_cs');
-        }
-        if ($user->role === 'Chef-Bureau1') {
-            return redirect()->route('accueil_cb1');
-        }
-        if ($user->role === 'Chef-Bureau2') {
-            return redirect()->route('accueil_cb2');
-        }
-        if ($user->role === 'Chef-Bureau3') {
-            return redirect()->route('accueil_cb3');
-        }
-
-        if ($employe) {
+        } elseif ($user->role === 'Chef-Bureau1') {
             return redirect()->route('accueil_employe');
+        } elseif ($user->role === 'Chef-Bureau2') {
+            return redirect()->route('accueil_employe');
+        } elseif ($user->role === 'Chef-Bureau3') {
+            return redirect()->route('accueil_employe');
+        } elseif ($employe) {
+            return redirect()->route('accueil_employe');
+        } else {
+            Auth::logout();
+            return redirect()->route('login')->with('error', 'Votre compte n’est pas associé à un employé. Veuillez contacter l’administrateur.');
         }
 
         return redirect()->intended(route('dashboard', absolute: false));

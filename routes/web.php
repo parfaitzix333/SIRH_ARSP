@@ -303,6 +303,15 @@ Route::middleware('auth')->group(function () {
     Route::get('/lecture/{id}', [CommuniqueController::class, 'lecture'])->name('lecture');
     route::get('/mon_autorisation/{employe}', [EmployeController::class, 'mon_autorisation'])->name('mon_autorisation');
 
+
+
+    //les route des chefs de bureau
+    Route::get('/les_employes_cb', [ChefBureauController::class, 'les_employes'])->name('les_employes_cb');
+    Route::get('/les_mouvements_mois_cb', [ChefBureauController::class, 'les_mouvements_mois'])->name('les_mouvements_mois_cb');
+    Route::get('/les_mouvements_jour_cb', [ChefBureauController::class, 'les_mouvements_jour'])->name('les_mouvements_jour_cb');
+    Route::get('/les_presences_jour_cb', [ChefBureauController::class, 'les_presences_jour'])->name('les_presences_jour_cb');
+    Route::get('/les_presences_mois_cb', [ChefBureauController::class, 'les_presences_mois'])->name('les_presences_mois_cb');
+
     //les affichages communs
 });
 

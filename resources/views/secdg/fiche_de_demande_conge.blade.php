@@ -141,6 +141,11 @@
             border-radius: 4px;
             cursor: pointer;
             font-size: 13px;
+            margin: 0 4px;
+        }
+
+        .btn-print:hover {
+            background: #1d4ed8;
         }
 
         @media print {
@@ -265,136 +270,249 @@
         ];
     @endphp
 
-    <main class="sheet">
-        <div class="sheet-header">Formulaire de demande de congé</div>
-        <div class="year-bar">Année {{ $anneeActuelle }}</div>
+    {{-- Boutons (hors du sheet pour ne pas apparaître dans le PDF) --}}
+    <div class="no-print">
+        <button class="btn-print" onclick="generatePDF()">📄 Générer PDF</button>
+        <button class="btn-print" onclick="window.print()">🖨️ Imprimer</button>
+    </div>
 
-        <table>
-            <tr>
-                <td class="label">Nom :</td>
-                <td>{{ $employe?->nom ?? '—' }}</td>
-                <td>Date d'engagement :</td>
-                <td>{{ $employe?->date_engagement?->format('d/m/Y') ?? '—' }}</td>
-            <tr>
-                <td class="label">Fonction :</td>
-                <td>{{ $audit?->role ?? '—' }}</td>
-                <td>Grade(CC,CB,CS,CD) :
-                </td>
-                <td>{{ $employe?->grade?->designation ?? '—' }}</td>
+    <div class="p-4 sheetmarginOut">
+        <main class="sheet" id="sheet">
+            <div class="sheet-header">Formulaire de demande de congé</div>
+            <div class="year-bar">Année {{ $anneeActuelle }}</div>
 
-            <tr>
-                <td class="label">Direction :</td>
-                <td>HAUT-KATANGA</td>
-                <td class="label">Matricule :</td>
-                <td>{{ $employe?->matricule ?? '—' }}</td>
-            </tr>
-            <tr>
-                <td class="label">Employeur :</td>
-                <td colspan="3">ARSP</td>
-            </tr>
-        </table>
-
-        <div class="sub-title">Interimaire</div>
-
-        <table>
-            <tr>
-                <td class="label">Nom :</td>
-                <td>{{ $interimaire?->nom ?? '—' }}</td>
-                <td class="label">Grade(CB,CS,CD) :</td>
-                <td>{{ $interimaire?->grade?->designation ?? '—' }}</td>
-            </tr>
-            <tr>
-                <td class="label">Fonction :</td>
-                <td>{{ $audit2?->role ?? '—' }}</td>
-                <td class="label">Matricule :</td>
-                <td>{{ $interimaire?->matricule ?? '—' }}</td>
-            </tr>
-        </table>
-
-        <table class="details" style="margin-top: 0;">
-            <thead>
+            <table>
                 <tr>
-                    <th style="width: 23%;">Type de Congé</th>
-                    <th style="width: 12%;">Durée lég./Contr.</th>
-                    <th style="width: 12%;">Date départ</th>
-                    <th style="width: 12%;">Date retour</th>
-                    <th style="width: 12%;">Jrs Restants</th>
-                    <th style="width: 12%;">Observation</th>
-                    <th style="width: 9%;">Check HR</th>
+                    <td class="label">Nom :</td>
+                    <td>{{ $employe?->nom ?? '—' }}</td>
+                    <td>Date d'engagement :</td>
+                    <td>{{ $employe?->date_engagement?->format('d/m/Y') ?? '—' }}</td>
                 </tr>
-            </thead>
-            <tbody>
-                @foreach ($conges as $conge)
+                <tr>
+                    <td class="label">Fonction :</td>
+                    <td>{{ $audit?->role ?? '—' }}</td>
+                    <td>Grade(CC,CB,CS,CD) :</td>
+                    <td>{{ $employe?->grade?->designation ?? '—' }}</td>
+                </tr>
+                <tr>
+                    <td class="label">Direction :</td>
+                    <td>HAUT-KATANGA</td>
+                    <td class="label">Matricule :</td>
+                    <td>{{ $employe?->matricule ?? '—' }}</td>
+                </tr>
+                <tr>
+                    <td class="label">Employeur :</td>
+                    <td colspan="3">ARSP</td>
+                </tr>
+            </table>
+
+            <div class="sub-title">Interimaire</div>
+
+            <table>
+                <tr>
+                    <td class="label">Nom :</td>
+                    <td>{{ $interimaire?->nom ?? '—' }}</td>
+                    <td class="label">Grade(CB,CS,CD) :</td>
+                    <td>{{ $interimaire?->grade?->designation ?? '—' }}</td>
+                </tr>
+                <tr>
+                    <td class="label">Fonction :</td>
+                    <td>{{ $audit2?->role ?? '—' }}</td>
+                    <td class="label">Matricule :</td>
+                    <td>{{ $interimaire?->matricule ?? '—' }}</td>
+                </tr>
+            </table>
+
+            <table class="details" style="margin-top: 0;">
+                <thead>
                     <tr>
-                        <td>{{ $conge['type'] }}</td>
-                        <td>{{ $conge['duree'] }}</td>
-                        <td>{{ $conge['date_depart'] }}</td>
-                        <td>{{ $conge['date_retour'] }}</td>
-                        <td>{{ $conge['jours_restants'] }}</td>
-                        <td>{{ $conge['obs'] }}</td>
-                        <td>{{ $conge['check'] }}</td>
+                        <th style="width: 23%;">Type de Congé</th>
+                        <th style="width: 12%;">Durée lég./Contr.</th>
+                        <th style="width: 12%;">Date départ</th>
+                        <th style="width: 12%;">Date retour</th>
+                        <th style="width: 12%;">Jrs Restants</th>
+                        <th style="width: 12%;">Observation</th>
+                        <th style="width: 9%;">Check HR</th>
                     </tr>
-                    @if ($loop->first)
-                        @foreach ($exercices as $exercice)
+                </thead>
+                <tbody>
+                    @foreach ($conges as $conge)
+                        <tr>
+                            <td>{{ $conge['type'] }}</td>
+                            <td>{{ $conge['duree'] }}</td>
+                            <td>{{ $conge['date_depart'] }}</td>
+                            <td>{{ $conge['date_retour'] }}</td>
+                            <td>{{ $conge['jours_restants'] }}</td>
+                            <td>{{ $conge['obs'] }}</td>
+                            <td>{{ $conge['check'] }}</td>
+                        </tr>
+                        @if ($loop->first)
+                            @foreach ($exercices as $exercice)
+                                <tr class="exercise-row">
+                                    <td>* Exercice {{ $exercice['annee'] }}</td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td>{{ $exercice['jours'] }} jour(s)</td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                            @endforeach
                             <tr class="exercise-row">
-                                <td>* Exercice {{ $exercice['annee'] }}</td>
+                                <td>* Cumul</td>
                                 <td></td>
                                 <td></td>
                                 <td></td>
-                                <td>{{ $exercice['jours'] }} jour(s)</td>
+                                <td>{{ $cumulJours }} jour(s)</td>
                                 <td></td>
                                 <td></td>
                             </tr>
-                        @endforeach
-                        <tr class="exercise-row">
-                            <td>* Cumul</td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td>{{ $cumulJours }} jour(s)</td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                    @endif
-                @endforeach
-            </tbody>
-        </table>
+                        @endif
+                    @endforeach
+                </tbody>
+            </table>
 
-        <table class="signature-table">
-            <thead>
-                <tr>
-                    <th style="width: 20%;">Agent</th>
-                    <th style="width: 20%;">Sup.Hiérarch.</th>
-                    <th style="width: 20%;">Directeur</th>
-                    <th style="width: 20%;">DRH</th>
-                    <th style="width: 20%;">Observations</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td class="signature-cell">
-                        <div class="signature-name">Signature</div>
-                    </td>
-                    <td class="signature-cell">
-                        <div class="signature-name">Signature</div>
-                    </td>
-                    <td class="signature-cell">
-                        <div class="signature-name">Signature</div>
-                    </td>
-                    <td class="signature-cell">
-                        <div class="signature-name">Signature</div>
-                    </td>
-                    <td class="signature-cell">
-                        <div class="signature-name">{{ $demande->commentaire_validation ?: '—' }}</div>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+            <table class="signature-table">
+                <thead>
+                    <tr>
+                        <th style="width: 20%;">Agent</th>
+                        <th style="width: 20%;">Sup.Hiérarch.</th>
+                        <th style="width: 20%;">Directeur</th>
+                        <th style="width: 20%;">DRH</th>
+                        <th style="width: 20%;">Observations</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="signature-cell">
+                            <div class="signature-name">Signature</div>
+                        </td>
+                        <td class="signature-cell">
+                            <div class="signature-name">Signature</div>
+                        </td>
+                        <td class="signature-cell">
+                            <div class="signature-name">Signature</div>
+                        </td>
+                        <td class="signature-cell">
+                            <div class="signature-name">Signature</div>
+                        </td>
+                        <td class="signature-cell">
+                            <div class="signature-name">{{ $demande->commentaire_validation ?: '—' }}</div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </main>
+    </div>
 
-        <div class="no-print">
-            <button class="btn-print" onclick="window.print()">Imprimer</button>
-        </div>
-    </main>
+    <!-- Bibliothèques -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+
+    <script>
+        async function generatePDF() {
+            try {
+                const sheet = document.getElementById('sheet');
+                if (!sheet) {
+                    throw new Error('La fiche à exporter est introuvable.');
+                }
+
+                // 1. Capture HTML → Canvas (haute résolution)
+                const canvas = await html2canvas(sheet, {
+                    scale: 2,
+                    logging: false,
+                    useCORS: true,
+                    backgroundColor: '#ffffff'
+                });
+
+                // 2. Préparation du PDF (A4 portrait, mm)
+                const {
+                    jsPDF
+                } = window.jspdf;
+                const pdf = new jsPDF("p", "mm", "a4");
+
+                const pageWidth = pdf.internal.pageSize.getWidth();
+                const pageHeight = pdf.internal.pageSize.getHeight();
+
+                // 🔒 Marge de protection (en mm) autour du contenu
+                const margin = 10;
+
+                // Dimensions utiles (zone imprimable)
+                const usableWidth = pageWidth - margin * 2;
+                const usableHeight = pageHeight - margin * 2;
+
+                // Dimensions de l'image d'origine
+                const imgData = canvas.toDataURL("image/png");
+                const imgWidth = canvas.width;
+                const imgHeight = canvas.height;
+
+                // Calcul du ratio pour tenir dans la zone imprimable
+                const ratioWidth = usableWidth / imgWidth;
+                const ratioHeight = usableHeight / imgHeight;
+                const ratio = Math.min(ratioWidth, ratioHeight);
+
+                const finalWidth = imgWidth * ratio;
+                const finalHeight = imgHeight * ratio;
+
+                // Centrage horizontal
+                const offsetX = margin + (usableWidth - finalWidth) / 2;
+
+                if (finalHeight <= usableHeight) {
+                    // ✅ Tout tient sur une seule page
+                    pdf.addImage(imgData, "PNG", offsetX, margin, finalWidth, finalHeight);
+                } else {
+                    // 📄 Découpage sur plusieurs pages si nécessaire
+                    let remainingHeight = imgHeight;
+                    let position = 0;
+                    let pageIndex = 0;
+
+                    // Hauteur (en pixels source) correspondant à la zone imprimable
+                    const pageContentHeightPx = usableHeight / ratio;
+
+                    while (remainingHeight > 0) {
+                        if (pageIndex > 0) pdf.addPage();
+
+                        // Créer un canvas temporaire pour la tranche de cette page
+                        const sliceHeightPx = Math.min(pageContentHeightPx, remainingHeight);
+                        const sliceCanvas = document.createElement('canvas');
+                        sliceCanvas.width = imgWidth;
+                        sliceCanvas.height = sliceHeightPx;
+
+                        const ctx = sliceCanvas.getContext('2d');
+                        ctx.fillStyle = '#ffffff';
+                        ctx.fillRect(0, 0, sliceCanvas.width, sliceCanvas.height);
+                        ctx.drawImage(
+                            canvas,
+                            0, position, imgWidth, sliceHeightPx,
+                            0, 0, imgWidth, sliceHeightPx
+                        );
+
+                        const sliceData = sliceCanvas.toDataURL('image/png');
+                        const sliceFinalHeight = sliceHeightPx * ratio;
+
+                        pdf.addImage(
+                            sliceData,
+                            'PNG',
+                            offsetX,
+                            margin,
+                            finalWidth,
+                            sliceFinalHeight
+                        );
+
+                        position += sliceHeightPx;
+                        remainingHeight -= sliceHeightPx;
+                        pageIndex++;
+                    }
+                }
+
+                pdf.save("demande-conge-{{ $employe?->nom ?? 'agent' }}-{{ $demande->id }}.pdf");
+                console.log("PDF généré avec succès !");
+            } catch (error) {
+                console.error("Erreur :", error);
+                alert("Échec de génération du PDF. Voir la console.");
+            }
+        }
+    </script>
 </body>
 
 </html>

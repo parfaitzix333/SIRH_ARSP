@@ -807,6 +807,8 @@
                 padding: 0 !important;
             }
         }
+
+        
     </style>
 
     @stack('styles')
@@ -835,6 +837,7 @@
                 <h1>ARSP</h1>
                 <p>Autorité de Régulation de la Sous-traitance dans le Secteur Privé</p>
             </div>
+
         </div>
 
         {{-- Centre : Sélecteur Année --}}
@@ -896,26 +899,30 @@
     <aside class="app-sidebar" id="appSidebar" role="navigation" aria-label="Navigation principale">
         <div class="nav-section">
             <div class="nav-section-title">Menu principal</div>
-            <a href="{{ route('accueil_employe') }}"
-                class="nav-link {{ Route::is('accueil_employe') ? 'active' : '' }}">
+            <a href="{{ route('accueil_cb1') }}" class="nav-link {{ Route::is('accueil_cb1') ? 'active' : '' }}">
                 <i class="fas fa-home"></i>
                 <span>Accueil</span>
             </a>
-            <a href="{{ route('mes_conges') }}" class="nav-link {{ Route::is('mes_conges') ? 'active' : '' }}">
+
+            
+
+            <a href="{{ route('mes_conges_cb1') }}"
+                class="nav-link {{ Route::is('mes_conges_cb1') ? 'active' : '' }}">
                 <i class="fas fa-calendar-check"></i>
                 <span>Congés</span>
             </a>
-            <a href="{{ route('mes_presences') }}" class="nav-link {{ Route::is('mes_presences') ? 'active' : '' }}">
+            <a href="{{ route('mes_presences_cb1') }}"
+                class="nav-link {{ Route::is('mes_presences_cb1') ? 'active' : '' }}">
                 <i class="fas fa-user-clock"></i>
                 <span>Présences</span>
             </a>
-            <a href="{{ route('mes_disciplines') }}"
-                class="nav-link {{ Route::is('mes_disciplines') ? 'active' : '' }}">
+            <a href="{{ route('mes_disciplines_cb1') }}"
+                class="nav-link {{ Route::is('mes_disciplines_cb1') ? 'active' : '' }}">
                 <i class="fas fa-gavel"></i>
                 <span>Discipline</span>
             </a>
-            <a href="{{ route('mes_communiques') }}"
-                class="nav-link {{ Route::is('mes_communiques') ? 'active' : '' }}">
+            <a href="{{ route('mes_communiques_cb1') }}"
+                class="nav-link {{ Route::is('mes_communiques_cb1') ? 'active' : '' }}">
 
                 <i class="fas fa-bullhorn"></i>
 

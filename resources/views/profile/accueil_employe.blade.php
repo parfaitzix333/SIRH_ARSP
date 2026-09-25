@@ -139,7 +139,9 @@
                             </div>
                             <div class="col-md-6 info-item">
                                 <div class="info-label">Affectation</div>
-                                <div class="info-value">{{ $affectation?->poste?->designation ?? '—' }}</div>
+                                <div class="info-value">
+                                    {{ $affectation?->poste?->designation ?? ($affectation?->service?->nom_service ?? '—') }}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -200,9 +202,10 @@
                             @forelse ($disciplines as $action)
                                 <div class="discipline-item mb-2">
                                     <div class="d-flex justify-content-between gap-3">
-                                        <strong>{{ $action->type ?? 'Action disciplinaire' }}</strong><small
-                                            class="text-muted">{{ $action->date?->format('d/m/Y') ?? '—' }}</small></div>
-                                    <div class="small text-muted mt-1">{{ $action->description ?? 'Aucune description' }}
+                                        <strong>{{ $action->sanction?->designation ?? ($action->etat ?? 'Action disciplinaire') }}</strong><small
+                                            class="text-muted">{{ $action->DATE?->format('d/m/Y') ?? '—' }}</small>
+                                    </div>
+                                    <div class="small text-muted mt-1">{{ $action->contenu ?? 'Aucune description' }}
                                     </div>
                                 </div>
                             @empty

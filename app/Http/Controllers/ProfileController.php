@@ -185,7 +185,35 @@ class ProfileController extends Controller
     public function accueil_cs()
     {
         $user = Auth::user();
-        return view('profile.accueil_chef_serv', compact('user'));
+        $annee = annee::where('statut', 'active')->first();
+        $anneeId = $annee?->id;
+
+        $employes = employe::with([
+            'service',
+            'grade',
+            'affectations' => fn($query) => $query->with(['poste', 'service'])->latest('date_debut'),
+        ])
+            ->when($anneeId, fn($query) => $query->where('annee_id', $anneeId))
+            ->orderBy('nom')
+            ->get();
+
+        $disciplines = \App\Models\discipline::with(['employe', 'sanction'])
+            ->when($anneeId, fn($query) => $query->where('annee_id', $anneeId))
+            ->latest('DATE')
+            ->get();
+
+        $postes = \App\Models\poste::withCount('affectations')
+            ->when($anneeId, fn($query) => $query->where('annee_id', $anneeId))
+            ->orderBy('intitule')
+            ->get();
+
+        return view('profile.accueil_chef_serv', compact(
+            'user',
+            'annee',
+            'employes',
+            'disciplines',
+            'postes',
+        ));
     }
 
     public function accueil_cd()
@@ -216,7 +244,13 @@ class ProfileController extends Controller
     }
     public function accueil_employe()
     {
-        $user = User::with(['employe.service', 'employe.grade', 'employe.disciplines'])
+        $user = User::with([
+            'employe.service',
+            'employe.grade',
+            'employe.disciplines.sanction',
+            'employe.affectations.poste',
+            'employe.affectations.service',
+        ])
             ->findOrFail(Auth::id());
         return view('profile.accueil_employe', compact('user'));
     }
