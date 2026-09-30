@@ -825,6 +825,7 @@
 </head>
 
 <body>
+    @include('partials.sablier')
 
     <!-- ============================================
     EN-TÊTE

@@ -24,21 +24,8 @@ return new class extends Migration
 
             $table->decimal('score_reconnaissance', 6, 5)->nullable();
 
-            $table->string('SOURCE', 50)
-                ->default('desktop');
-
-            $table->boolean('synchronise')
-                ->default(false);
-
-            $table->dateTime('synced_at')->nullable();
-
             $table->foreignId('annee_id')
                 ->constrained('annees');
-
-            $table->enum('autorisation', [
-                'oui',
-                'non'
-            ])->default('non');
 
             $table->timestamps();
         });

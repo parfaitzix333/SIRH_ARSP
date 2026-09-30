@@ -821,6 +821,7 @@
 </head>
 
 <body>
+    @include('partials.sablier')
     @php
         $currentUser = Auth::user();
         $selectedAnneeId = session('annee_id') ?? $currentUser?->annee_id;

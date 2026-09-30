@@ -28,14 +28,19 @@ use App\Http\Controllers\ReglementController;
 use App\Http\Controllers\SanctionController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\DgController;
+use App\Http\Controllers\FaceTemplateController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SecDgController;
 use App\Http\Controllers\UtilisateurController;
 use App\Http\Controllers\InterimeController;
+use App\Models\contact;
+use App\Models\propriete;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
+    $apropos_arsp = propriete::first();
+    $contact = contact::first();
+    return view('welcome', compact('apropos_arsp', 'contact'));
 });
 
 Route::get('/dashboard', function () {
@@ -46,6 +51,7 @@ Route::get('/form_employe_register', [UtilisateurController::class, 'form_employ
 Route::get('/form_employe_login', [UtilisateurController::class, 'form_employe_login'])->name('form_employe_login');
 Route::post('/employe_register', [UtilisateurController::class, 'employe_register'])->name('employe_register');
 Route::post('/employe_login', [UtilisateurController::class, 'employe_login'])->name('employe_login');
+
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -312,7 +318,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/les_presences_jour_cb', [ChefBureauController::class, 'les_presences_jour'])->name('les_presences_jour_cb');
     Route::get('/les_presences_mois_cb', [ChefBureauController::class, 'les_presences_mois'])->name('les_presences_mois_cb');
 
+
+
     //les affichages communs
+
 });
 
 require __DIR__ . '/auth.php';

@@ -13,20 +13,7 @@ return new class extends Migration
 
             $table->foreignId('employe_id')
                 ->constrained('employes');
-
-            $table->binary('face_embedding1');
-            $table->binary('face_embedding2')->nullable();
-            $table->binary('face_embedding3')->nullable();
-            $table->binary('face_embedding4')->nullable();
-            $table->binary('face_embedding5')->nullable();
-
-            $table->enum('mouvement', [
-                'entree',
-                'sortie'
-            ]);
-
-            $table->time('heure');
-            $table->date('DATE');
+            $table->binary('face_embedding', 2048);
 
             $table->foreignId('annee_id')
                 ->constrained('annees');

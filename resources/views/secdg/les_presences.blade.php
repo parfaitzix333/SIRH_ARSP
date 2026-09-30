@@ -9,7 +9,6 @@
             ['key' => 'heure', 'label' => 'Heure'],
             ['key' => 'mouvement', 'label' => 'Mouvement', 'type' => 'status'],
             ['key' => 'score_reconnaissance', 'label' => 'Score'],
-            ['key' => 'autorisation', 'label' => 'Autorisation', 'type' => 'status'],
         ],
         'resource' => 'presences',
         'fields' => [
@@ -39,15 +38,7 @@
                 'step' => '0.00001',
                 'min' => '0',
             ],
-            ['key' => 'SOURCE', 'label' => 'Source', 'default' => 'desktop'],
-            ['key' => 'synchronise', 'label' => 'Synchronisé', 'type' => 'checkbox', 'default' => false],
-            [
-                'key' => 'autorisation',
-                'label' => 'Autorisation',
-                'type' => 'select',
-                'options' => collect([['value' => 'oui', 'label' => 'Oui'], ['value' => 'non', 'label' => 'Non']]),
-                'default' => 'non',
-            ],
+    
             [
                 'key' => 'annee_id',
                 'label' => 'Année',

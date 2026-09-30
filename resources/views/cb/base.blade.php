@@ -807,14 +807,13 @@
                 padding: 0 !important;
             }
         }
-
-        
     </style>
 
     @stack('styles')
 </head>
 
 <body>
+    @include('partials.sablier')
     @php
         $currentUser = Auth::user();
         $selectedAnneeId = session('annee_id') ?? $currentUser?->annee_id;
@@ -904,7 +903,7 @@
                 <span>Accueil</span>
             </a>
 
-            
+
 
             <a href="{{ route('mes_conges_cb1') }}"
                 class="nav-link {{ Route::is('mes_conges_cb1') ? 'active' : '' }}">

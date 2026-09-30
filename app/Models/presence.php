@@ -12,17 +12,11 @@ class presence extends Model
         'heure',
         'mouvement',
         'score_reconnaissance',
-        'SOURCE',
-        'synchronise',
-        'synced_at',
         'annee_id',
-        'autorisation',
     ];
 
     protected $casts = [
         'DATE' => 'date',
-        'synchronise' => 'boolean',
-        'synced_at' => 'datetime',
     ];
 
     public function employe()

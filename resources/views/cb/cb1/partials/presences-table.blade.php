@@ -65,7 +65,6 @@
                         <th>Mouvement</th>
                         <th>Heure</th>
                         <th>Date</th>
-                        <th>Source</th>
                         @if ($actions)
                             <th class="text-center">Actions</th>
                         @endif
@@ -82,7 +81,7 @@
                             </td>
                             <td>{{ $presence->heure }}</td>
                             <td>{{ $presence->DATE?->format('d/m/Y') ?? '—' }}</td>
-                            <td>{{ $presence->SOURCE ?? '—' }}</td>
+
                             @if ($actions)
                                 <td class="text-center text-nowrap">
                                     @if ($user->autorisation == 1)
@@ -150,8 +149,6 @@
                                 <option value="entree">Entrée</option>
                                 <option value="sortie">Sortie</option>
                             </select></div>
-                        <input type="hidden" name="annee_id" value="{{ $anneeId }}"><input type="hidden"
-                            name="SOURCE" value="bureau">
                     </div>
                     <div class="modal-footer"><button type="button" class="btn btn-light"
                             data-bs-dismiss="modal">Annuler</button><button
@@ -201,9 +198,7 @@
                                     <option value="entree" @selected($presence->mouvement === 'entree')>Entrée</option>
                                     <option value="sortie" @selected($presence->mouvement === 'sortie')>Sortie</option>
                                 </select></div>
-                            <input type="hidden" name="annee_id"
-                                value="{{ $presence->annee_id ?? $anneeId }}"><input type="hidden" name="SOURCE"
-                                value="{{ $presence->SOURCE ?? 'bureau' }}">
+
                         </div>
                         <div class="modal-footer"><button type="button" class="btn btn-light"
                                 data-bs-dismiss="modal">Annuler</button><button
