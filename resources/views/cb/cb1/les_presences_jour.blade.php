@@ -1,6 +1,9 @@
 @extends('emp.base')
 
 @section('content')
+<div class="container-fluid">
+    
+</div>
     @include('cb.cb1.partials.presences-table', [
         'presences' => $les_presences_jour,
         'titre' => 'Présences du jour',

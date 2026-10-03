@@ -13,4 +13,5 @@ Route::prefix('face')->group(function () {
     Route::get('/health',     [FaceTemplateController::class, 'health']);
     Route::get('/employees',  [FaceTemplateController::class, 'employees']);
     Route::post('/recognize', [FaceTemplateController::class, 'recognize']);
+    Route::post('/pointer',   [FaceTemplateController::class, 'pointer']);
 });

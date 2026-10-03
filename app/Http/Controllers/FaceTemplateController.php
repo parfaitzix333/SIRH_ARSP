@@ -3,16 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Services\FaceRecognitionService;
+use App\Services\PointageService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class FaceTemplateController extends Controller
 {
     protected FaceRecognitionService $faceApi;
+    protected PointageService $pointage;
 
-    public function __construct(FaceRecognitionService $faceApi)
+    public function __construct(FaceRecognitionService $faceApi, PointageService $pointage)
     {
         $this->faceApi = $faceApi;
+        $this->pointage = $pointage;
     }
 
     /**
@@ -77,6 +80,31 @@ class FaceTemplateController extends Controller
                 'ok'    => false,
                 'error' => $e->getMessage(),
             ], 422);
+        }
+    }
+
+    /**
+     * POST /api/face/pointer
+     * Identifie l'employé puis enregistre son entrée ou sa sortie.
+     */
+    public function pointer(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'file' => 'required|file|image|max:10240',
+        ]);
+
+        try {
+            return response()->json($this->pointage->pointer($validated['file']));
+        } catch (\Throwable $e) {
+            report($e);
+
+            return response()->json([
+                'ok' => false,
+                'reconnu' => false,
+                'mouvement' => null,
+                'message' => 'Le pointage est temporairement indisponible.',
+                'error' => $e->getMessage(),
+            ], 503);
         }
     }
 }

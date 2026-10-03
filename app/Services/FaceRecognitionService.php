@@ -99,4 +99,5 @@ class FaceRecognitionService
 
         return $response->json();
     }
+    
 }
