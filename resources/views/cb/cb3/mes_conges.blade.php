@@ -103,7 +103,7 @@
                                     <label for="piece_justificative" class="form-label">Pièce justificative</label>
                                     <input type="file" name="piece_justificative" id="piece_justificative"
                                         class="form-control">
-                                    <div class="form-text">Facultative, 10 Mo maximum.</div>
+                                    <div class="form-text">Facultative, 15 Mo maximum.</div>
                                 </div>
                             </div>
                         </div>

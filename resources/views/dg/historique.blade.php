@@ -340,6 +340,11 @@
                 </span>
             </div>
             <div class="right-actions">
+                <button type="button" class="btn btn-success" id="exportHistoryExcelBtn"
+                    data-excel-export-for="historiqueTable" title="Exporter les lignes affichées vers Excel">
+                    <i class="fas fa-file-excel me-1" aria-hidden="true"></i> Exporter Excel
+                    <i class="fas fa-download ms-1" aria-hidden="true"></i>
+                </button>
                 <button type="button" class="btn-delete-selected" id="deleteSelectedBtn">
                     <i class="fas fa-trash-alt"></i> Supprimer sélectionnés
                 </button>
@@ -462,6 +467,7 @@
         </div>
     </div>
 
+    <script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
 
@@ -479,6 +485,32 @@
             const clearSearch = document.getElementById('clearSearch');
             const resultCount = document.getElementById('resultCount');
             const noResult = document.getElementById('noResult');
+
+            document.getElementById('exportHistoryExcelBtn')?.addEventListener('click', function() {
+                const table = document.getElementById('historiqueTable');
+                if (!table || !window.XLSX?.utils || !window.XLSX?.writeFile) {
+                    alert('Export impossible : le tableau ou le module Excel est indisponible.');
+                    return;
+                }
+
+                const exportTable = table.cloneNode(true);
+                exportTable.querySelectorAll('tbody tr').forEach((row) => {
+                    if (!row.hasAttribute('data-row') || row.hidden || row.style.display ===
+                        'none') {
+                        row.remove();
+                    }
+                });
+                exportTable.querySelectorAll('tr').forEach((row) => {
+                    row.firstElementChild?.remove();
+                    row.lastElementChild?.remove();
+                });
+
+                const workbook = XLSX.utils.table_to_book(exportTable, {
+                    sheet: 'Historique'
+                });
+                const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+                XLSX.writeFile(workbook, `historique_${timestamp}.xlsx`);
+            });
 
             // ===== SÉLECTION =====
             function getRowCheckboxes() {

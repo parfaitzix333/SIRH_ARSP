@@ -742,6 +742,10 @@
                     <div class="value">{{ $employe->matricule ?? 'Non défini' }}</div>
                 </div>
                 <div class="info-group">
+                    <div class="label">Genre</div>
+                    <div class="value">{{ $employe->genre ?? 'Non défini' }}</div>
+                </div>
+                <div class="info-group">
                     <div class="label">Service</div>
                     <div class="value">{{ $mon_service->nom_service ?? 'Non défini' }}</div>
                 </div>

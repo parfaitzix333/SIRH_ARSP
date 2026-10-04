@@ -16,7 +16,7 @@ class DossiersEtudeController extends Controller
                 $hasFile ? 'required' : 'nullable',
                 'file',
                 'mimes:pdf,doc,docx,jpg,jpeg,png,webp,xls,xlsx,ppt,pptx,txt,zip',
-                'max:20480',
+                'max:15360',
             ],
             'annee_id' => ['required', 'exists:annees,id'],
             'employe_id' => ['required', 'exists:employes,id'],

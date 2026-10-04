@@ -1185,6 +1185,7 @@
         });
     </script>
 
+    @include('partials.excel-table-export')
     @stack('scripts')
 
 </body>

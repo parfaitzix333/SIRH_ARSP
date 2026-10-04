@@ -396,12 +396,50 @@
             </div>
         </div>
 
-        <div class="input-group w-75 mb-3" id="searchInputContainer">
-            <input type="search" id="searchInput" class="form-control" placeholder="Rechercher..." autocomplete="off">
-            <span class="input-group-text bg-primary text-white">
-                <i class="fas fa-search"></i>
-            </span>
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-3">
+            <div class="input-group w-75 mb-3" id="searchInputContainer">
+                <input type="search" id="searchInput" class="form-control" placeholder="Rechercher..." autocomplete="off">
+                <span class="input-group-text bg-primary text-white">
+                    <i class="fas fa-search"></i>
+                </span>
+            </div>
+            <button type="button" class="btn btn-success mb-3" id="exportExcelBtn" data-excel-export-for="userTable"
+                title="Exporter les utilisateurs affichés vers Excel"
+                aria-label="Exporter les utilisateurs affichés vers Excel">
+                <i class="fas fa-file-excel" aria-hidden="true"></i> Fichier Excel
+                <i class="fa fa-download" aria-hidden="true"></i>
+            </button>
         </div>
+
+        <!-- Inclure SheetJS -->
+        <script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
+
+        <script>
+            function exportToExcel() {
+                const table = document.getElementById('userTable');
+                if (!table || !window.XLSX?.utils || !window.XLSX?.writeFile) {
+                    showNotification('Export impossible : le tableau ou le module Excel est indisponible.', 'error');
+                    return;
+                }
+
+                const exportTable = table.cloneNode(true);
+                exportTable.querySelectorAll('tbody tr').forEach((row) => {
+                    if (row.hidden || row.style.display === 'none' || row.querySelector('.empty-state')) {
+                        row.remove();
+                    }
+                });
+                exportTable.querySelectorAll('tr').forEach((row) => row.lastElementChild?.remove());
+
+                const workbook = XLSX.utils.table_to_book(exportTable, {
+                    sheet: 'Utilisateurs'
+                });
+                const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+                XLSX.writeFile(workbook, `les_utilisateurs_${timestamp}.xlsx`);
+            }
+
+            document.getElementById('exportExcelBtn')?.addEventListener('click', exportToExcel);
+        </script>
+
 
         <div class="table-wrapper">
             <table class="table table-striped" id="userTable">
@@ -532,11 +570,13 @@
                             </div>
                             <div class="form-group">
                                 <label class="form-label"><i class="fas fa-user"></i> Nom complet</label>
-                                <input type="text" name="name" id="edit_name" class="form-control-modern" required>
+                                <input type="text" name="name" id="edit_name" class="form-control-modern"
+                                    required>
                             </div>
                             <div class="form-group">
                                 <label class="form-label"><i class="fas fa-envelope"></i> Adresse email</label>
-                                <input type="email" name="email" id="edit_email" class="form-control-modern" required>
+                                <input type="email" name="email" id="edit_email" class="form-control-modern"
+                                    required>
                             </div>
                             <div class="form-group">
                                 <label class="form-label"><i class="fas fa-lock"></i> Nouveau mot de passe</label>

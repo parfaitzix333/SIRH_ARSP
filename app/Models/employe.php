@@ -21,6 +21,7 @@ class employe extends Model
         'user_id',
         'annee_id',
         'emploiyeur',
+        'genre',
     ];
 
     protected $casts = [

@@ -84,6 +84,8 @@
             <dl class="row identity mb-0">
                 <dt class="col-sm-3">Nom</dt>
                 <dd class="col-sm-3">{{ $employe->nom }}</dd>
+                <dt class="col-sm-3">Genre</dt>
+                <dd class="col-sm-3">{{ $employe->genre ?? '—' }}</dd>
                 <dt class="col-sm-3">Date d’engagement</dt>
                 <dd class="col-sm-3">{{ $employe->date_engagement?->format('d/m/Y') ?? '—' }}</dd>
                 <dt class="col-sm-3">Grade</dt>

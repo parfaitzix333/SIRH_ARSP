@@ -98,7 +98,7 @@ class DemandeCongeController extends Controller
                 'date_debut' => ['required', 'date'],
                 'date_fin' => ['required', 'date', 'after_or_equal:date_debut'],
                 'motif' => ['nullable', 'string', 'max:5000'],
-                'piece_justificative' => ['nullable', 'file', 'max:10240'],
+                'piece_justificative' => ['nullable', 'file', 'max:15360'],
             ]);
 
             $dateDebut = Carbon::parse($validated['date_debut']);

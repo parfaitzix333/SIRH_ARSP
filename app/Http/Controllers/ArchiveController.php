@@ -14,7 +14,7 @@ class ArchiveController extends Controller
     private function rules(bool $update = false, bool $hasUpload = false): array
     {
         $fichierRules = $hasUpload
-            ? ['file', 'max:10240']
+            ? ['file', 'max:15360']
             : ['string', 'max:255'];
 
         if ($update) {

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\FaceRecognitionService;
+use App\Services\EnrollmentService;
 use App\Services\PointageService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -11,11 +12,16 @@ class FaceTemplateController extends Controller
 {
     protected FaceRecognitionService $faceApi;
     protected PointageService $pointage;
+    protected EnrollmentService $enrollment;
 
-    public function __construct(FaceRecognitionService $faceApi, PointageService $pointage)
-    {
+    public function __construct(
+        FaceRecognitionService $faceApi,
+        PointageService $pointage,
+        EnrollmentService $enrollment
+    ) {
         $this->faceApi = $faceApi;
         $this->pointage = $pointage;
+        $this->enrollment = $enrollment;
     }
 
     /**
@@ -65,7 +71,7 @@ class FaceTemplateController extends Controller
     public function recognize(Request $request): JsonResponse
     {
         $request->validate([
-            'file' => 'required|file|image|max:10240',
+            'file' => 'required|file|image|max:15360',
         ]);
 
         try {
@@ -90,7 +96,7 @@ class FaceTemplateController extends Controller
     public function pointer(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'file' => 'required|file|image|max:10240',
+            'file' => 'required|file|image|max:15360',
         ]);
 
         try {
@@ -105,6 +111,36 @@ class FaceTemplateController extends Controller
                 'message' => 'Le pointage est temporairement indisponible.',
                 'error' => $e->getMessage(),
             ], 503);
+        }
+    }
+
+    /**
+     * POST /api/face/enroll
+     * Enrôle un employé à partir de cinq images.
+     */
+    public function enroll(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'employe_id' => ['required', 'integer', 'exists:employes,id'],
+            'files' => ['required', 'array', 'size:5'],
+            'files.*' => ['required', 'file', 'image', 'mimes:jpg,jpeg,png', 'max:15360'],
+        ]);
+
+        try {
+            $data = $this->enrollment->enroll((int) $validated['employe_id'], $validated['files']);
+
+            return response()->json([
+                'ok' => true,
+                'data' => $data,
+            ]);
+        } catch (\Throwable $e) {
+            report($e);
+            $status = in_array($e->getCode(), [400, 404, 422], true) ? $e->getCode() : 502;
+
+            return response()->json([
+                'ok' => false,
+                'error' => $e->getMessage(),
+            ], $status);
         }
     }
 }

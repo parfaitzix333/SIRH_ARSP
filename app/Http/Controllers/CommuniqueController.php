@@ -73,7 +73,7 @@ class CommuniqueController extends Controller
                 $hasFile ? 'required' : 'nullable',
                 'file',
                 'mimes:pdf,doc,docx,xls,xlsx,ppt,pptx,jpg,jpeg,png,txt,zip',
-                'max:20480',
+                'max:15360',
             ],
             'role_cible' => ['required', 'string', 'max:100', 'in:' . implode(',', $roles)],
             'user_id' => ['required', 'exists:users,id'],

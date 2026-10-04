@@ -24,6 +24,7 @@ return new class extends Migration
             $table->string('territoire', 150)->nullable();
             $table->string('localite', 150)->nullable();
             $table->string('niveau_etude', 150)->nullable();
+            $table->enum('genre', ['Masculin', 'Féminin'])->nullable();
 
             $table->foreignId('user_id')
                 ->nullable()

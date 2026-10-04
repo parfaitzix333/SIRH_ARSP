@@ -22,7 +22,7 @@ class FormationEmployeController extends Controller
                 $hasFile ? 'required' : 'nullable',
                 'file',
                 'mimes:pdf,doc,docx,xls,xlsx,ppt,pptx,jpg,jpeg,png,webp,txt,zip',
-                'max:20480',
+                'max:15360',
             ],
             'annee_id' => ['required', 'exists:annees,id'],
         ];

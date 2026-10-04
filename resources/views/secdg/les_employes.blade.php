@@ -6,6 +6,7 @@
         'columns' => [
             ['key' => 'matricule', 'label' => 'Matricule'],
             ['key' => 'nom', 'label' => 'Nom'],
+            ['key' => 'genre', 'label' => 'Genre'],
             ['key' => 'date_engagement', 'label' => 'Date d’engagement', 'type' => 'date'],
             ['key' => 'grade.designation', 'label' => 'Grade'],
             ['key' => 'service.nom_service', 'label' => 'Service'],
@@ -15,6 +16,15 @@
         'fields' => [
             ['key' => 'matricule', 'label' => 'Matricule', 'required' => true],
             ['key' => 'nom', 'label' => 'Nom', 'required' => true],
+            [
+                'key' => 'genre',
+                'label' => 'Genre',
+                'type' => 'select',
+                'options' => [
+                    ['value' => 'Masculin', 'label' => 'Masculin'],
+                    ['value' => 'Féminin', 'label' => 'Féminin'],
+                ],
+            ],
             ['key' => 'grade_id', 'label' => 'Grade', 'type' => 'select', 'options' => 'grades'],
             ['key' => 'service_id', 'label' => 'Service', 'type' => 'select', 'options' => 'services'],
             ['key' => 'date_naissance', 'label' => 'Date de naissance', 'type' => 'date'],
