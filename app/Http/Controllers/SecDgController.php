@@ -283,7 +283,7 @@ class SecDgController extends Controller
 
     public function fiche_de_demande_conge($id)
     {
-        abort_unless(Auth::user()?->role === 'SecDG', 403);
+        abort_unless(Auth::user()?->role === 'SecP', 403);
         $user = Auth::user();
         $demande = demandes_conge::with(['employe', 'interimaire', 'conge', 'validePar', 'annee'])
             ->where('valide_secDg', true)

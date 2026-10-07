@@ -20,7 +20,7 @@ class UtilisateurController extends Controller
     private const ROLES = [
         'user',
         'DP',
-        'SecDG',
+        'SecP',
         'Chef-Division',
         'Chef-Service',
         'Chef-Bureau1',

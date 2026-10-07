@@ -1,6 +1,7 @@
 @extends('emp.base')
 
 @section('content')
+@include('partials.avertissement_api_test')
 <div class="container-fluid">
     
 </div>

@@ -1,6 +1,7 @@
 @extends('emp.base')
 
 @section('content')
+    @include('partials.avertissement_api_test')
     <div class="container-fluid py-4">
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
             <div>

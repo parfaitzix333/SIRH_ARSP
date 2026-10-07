@@ -35,6 +35,7 @@ use App\Http\Controllers\UtilisateurController;
 use App\Http\Controllers\InterimeController;
 use App\Models\contact;
 use App\Models\propriete;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -44,7 +45,8 @@ Route::get('/', function () {
 });
 
 Route::get('/dashboard', function () {
-    return view('dashboard');
+    $user = Auth::user();
+    return view('dashboard', compact('user'));
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::get('/form_employe_register', [UtilisateurController::class, 'form_employe_register'])->name('form_employe_register');

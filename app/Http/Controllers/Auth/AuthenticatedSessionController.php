@@ -39,7 +39,7 @@ class AuthenticatedSessionController extends Controller
             Auth::logout();
             return redirect()->route('login')->with('error', 'Votre compte est suspendu. Veuillez contacter l’administrateur.');
         }
-        if ($user->role === 'SecDG') {
+        if ($user->role === 'SecP') {
             return redirect()->route('accueil_secDg');
         }
         if ($user->role === 'Chef-Division') {

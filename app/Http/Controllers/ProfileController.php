@@ -172,7 +172,7 @@ class ProfileController extends Controller
 
         abort_unless($user?->autorisation === true, 403);
 
-        return view('profile.accueil_secGeneral', $this->dashboardViewData('secdg.base', [
+        return view('profile.accueil_secGeneral', $this->dashboardViewData('SecP.base', [
             'utilisateurs' => 'les_utilisateurs_SG',
             'employes' => 'les_employes_SG',
             'affectations' => 'les_affectations_SG',

@@ -914,7 +914,9 @@
 
 
 
-            @if ($user->role === 'Chef-Bureau1')
+            @php($currentUser = Auth::user())
+
+            @if (($currentUser?->role ?? null) === 'Chef-Bureau1')
                 <a href="{{ route('les_presences_jour_cb') }}"
                     class="nav-link {{ Route::is('les_presences_jour_cb') ? 'active' : '' }}" id="b1_link">
                     <i class="fas fa-calendar-day"></i>
@@ -930,7 +932,7 @@
                     <i class="fas fa-calendar-check"></i>
                     <span>Les Employés</span>
                 </a>
-            @elseif ($user->role === 'Chef-Bureau2')
+            @elseif (($currentUser?->role ?? null) === 'Chef-Bureau2')
                 <a href="{{ route('les_mouvements_jour_cb') }}"
                     class="nav-link {{ Route::is('les_mouvements_jour_cb') ? 'active' : '' }}" id="b1_link">
                     <i class="fas fa-calendar-check"></i>
@@ -947,7 +949,6 @@
                     <i class="fas fa-calendar-check"></i>
                     <span>Les Employés</span>
                 </a>
-            @else
             @endif
 
             <a href="{{ route('mes_conges') }}" class="nav-link {{ Route::is('mes_conges') ? 'active' : '' }}">

@@ -85,6 +85,7 @@
             }
         }
     </style>
+    @include('partials.avertissement_api_test')
 
     <main class="container-fluid py-4 employees-page">
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
@@ -133,14 +134,34 @@
                                     {{ $employe->service?->nom_service ?? '—' }}
                                     <span class="badge text-bg-primary ms-1">{{ $employe->service?->domaine ?? '—' }}</span>
                                 </td>
+                                @php
+                                    $employe_enrole = App\Models\face_template::where(
+                                        'employe_id',
+                                        $employe->id,
+                                    )->get();
+                                    $a_des_templates = $employe_enrole->isNotEmpty();
+                                @endphp
                                 <td>
-                                    <button type="button" class="btn btn-outline-primary btn-sm shadow-lg"
-                                        data-bs-toggle="modal" data-bs-target="#enrollementModal"
-                                        data-employe-id="{{ $employe->id }}" aria-label="Enrôler {{ $employe->nom }}"
-                                        title="Enrôler par reconnaissance faciale">
-                                        <i class="fa fa-camera" aria-hidden="true"></i>
-                                        <i class="fa fa-id-badge" aria-hidden="true"></i>
-                                    </button>
+                                    @if ($a_des_templates)
+                                        <button type="button" class="btn btn-outline-danger btn-sm shadow-lg"
+                                            data-bs-toggle="modal" data-bs-target="#enrollementModal"
+                                            data-employe-id="{{ $employe->id }}" aria-label="Enrôler {{ $employe->nom }}"
+                                            title="Enrôler par reconnaissance faciale">
+                                            <i class="fa fa-camera" aria-hidden="true"></i>
+                                            <i class="fa fa-id-badge" aria-hidden="true"></i>
+                                        </button>
+                                        <span class="text-danger ms-1" aria-label="Nombre d’images enrôlées">
+                                            {{ $employe_enrole->count() }}
+                                        </span>
+                                    @else
+                                        <button type="button" class="btn btn-outline-primary btn-sm shadow-lg"
+                                            data-bs-toggle="modal" data-bs-target="#enrollementModal"
+                                            data-employe-id="{{ $employe->id }}" aria-label="Enrôler {{ $employe->nom }}"
+                                            title="Enrôler par reconnaissance faciale">
+                                            <i class="fa fa-camera" aria-hidden="true"></i>
+                                            <i class="fa fa-id-badge" aria-hidden="true"></i>
+                                        </button>
+                                    @endif
                                 </td>
                             </tr>
                         @empty
@@ -157,6 +178,8 @@
             </div>
         </section>
     </main>
+
+
 
     <div class="modal fade" id="enrollementModal" tabindex="-1" aria-labelledby="enrollementModalTitle" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable">

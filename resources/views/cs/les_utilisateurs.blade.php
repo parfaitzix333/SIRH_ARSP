@@ -19,7 +19,7 @@
             color: white;
         }
 
-        .role-badge.secdg,
+        .role-badge.secp,
         .role-badge.chef-division {
             background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
             color: white;
@@ -443,7 +443,7 @@
                                     $roleIcon = match ($role) {
                                         'user' => 'fa-user',
                                         'DP' => 'fa-crown',
-                                        'SecDG' => 'fa-user-shield',
+                                        'SecP' => 'fa-user-shield',
                                         'Chef-Division' => 'fa-sitemap',
                                         'Chef-Service' => 'fa-building',
                                         'Chef-Bureau1', 'Chef-Bureau2', 'Chef-Bureau3' => 'fa-briefcase',
@@ -475,7 +475,7 @@
                                 @endif
                             </td>
                             <td>
-                                @if ($u->role === 'DP' || $u->role === 'Chef-Division' || $u->role === 'SecDG' || $u->role === 'Chef-Service')
+                                @if ($u->role === 'DP' || $u->role === 'Chef-Division' || $u->role === 'SecP' || $u->role === 'Chef-Service')
                                     <i class="fa fa-ban text-secondary"></i>
                                 @else
                                     <div class="action-buttons">
@@ -556,7 +556,7 @@
                                 <label class="form-label"><i class="fas fa-tag"></i> Rôle</label>
                                 <select name="role" id="edit_role" class="form-control-modern" required>
                                     <option value="">-- Sélectionner un rôle --</option>
-                                    @foreach (['user', 'DP', 'SecDG', 'Chef-Division', 'Chef-Service', 'Chef-Bureau1', 'Chef-Bureau2', 'Chef-Bureau3', 'Employe', 'Suspendu'] as $role)
+                                    @foreach (['user', 'DP', 'SecP', 'Chef-Division', 'Chef-Service', 'Chef-Bureau1', 'Chef-Bureau2', 'Chef-Bureau3', 'Employe', 'Suspendu'] as $role)
                                         <option value="{{ $role }}">{{ $role }}</option>
                                     @endforeach
                                 </select>
